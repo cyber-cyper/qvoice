@@ -1,9 +1,16 @@
 # Changelog
 
-Version numbers: since 1.0.0 the versionCode stays 1 until the owner says to
-raise it; debug builds show the slice after the version ("1.0.0-slice22").
+Version numbers: one versionCode per Play upload, on the owner's go-ahead,
+with the versionName's last number (D-037). versionCode 1 (1.0.0) was the
+first upload, to closed testing on 6 October 2026, built from slice 20.
+Debug builds show the slice after the version ("1.0.1-slice22").
 
-## 1.0.0 — slice 22: "Preparing the voice…" — 2026-10-06 (versionCode 1)
+## 1.0.1 — slice 22: "Preparing the voice…" — 2026-10-06 (versionCode 2)
+
+- **versionCode 2, versionName 1.0.1**: the next Play upload (the first,
+  1.0.0, is in closed testing). The GitHub workflows run on Ubuntu 24.04
+  rather than "latest", which moves to Ubuntu 26 on 19 October 2026: the
+  build changes only when we change it.
 
 - **When the voice takes a moment**, it now shows. In the reader, a ring
   turns around the play button and "Preparing the voice…" replaces the
@@ -16,7 +23,7 @@ raise it; debug builds show the slice after the version ("1.0.0-slice22").
   a large voice on a mid-range phone can take several seconds.)
 - Tests: 233 (was 231), 4 new guards proven by mutation.
 
-## 1.0.0 — slice 21: Help, and a battery warning — 2026-10-06 (versionCode 1)
+## 1.0.1 — slice 21: Help, and a battery warning — 2026-10-06 (versionCode 2)
 
 - **Help**, from Home's top bar (?), from the setup card ("Need help?")
   and from About: answers to what people ask most, one open at a time,

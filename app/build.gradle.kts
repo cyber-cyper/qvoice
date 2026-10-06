@@ -71,13 +71,14 @@ android {
         applicationId = "com.riniso.qvoice"
         minSdk = 26
         targetSdk = 36
-        // Owner's rule: versionCode stays 1 (the first Play upload) until the
-        // owner says to increase it. Play refuses a second upload with the same
-        // code, so every later upload needs that go-ahead first.
-        versionCode = 1
-        // What Play and the About screen show. Debug builds add the slice
-        // (buildTypes.debug below), so a test build is never mistaken for it.
-        versionName = "1.0.0"
+        // One more for every upload to Play, on the owner's go-ahead (D-037):
+        // Play refuses a code it has seen. 1 = 1.0.0, the first upload (closed
+        // testing, 6 Oct 2026, built from slice 20); 2 = the next upload.
+        versionCode = 2
+        // What Play and the About screen show; its last number goes up with
+        // every upload, so testers and feedback emails tell builds apart.
+        // Debug builds add the slice (buildTypes.debug below).
+        versionName = "1.0.1"
 
         buildConfigField("String", "SOURCE_CODE_URL", "\"$sourceUrl\"")
 

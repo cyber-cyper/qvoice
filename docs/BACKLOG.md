@@ -1,7 +1,7 @@
 # QVoice backlog
 
 Each slice is small, self-contained and shippable. Status as of slice 22
-(version 1.0.0, versionCode 1).
+(version 1.0.1, versionCode 2; 1.0.0, versionCode 1, is in closed testing).
 
 ## Done
 
@@ -113,10 +113,15 @@ Each slice is small, self-contained and shippable. Status as of slice 22
 
 ## Next (in order; anything waiting for the owner moves up as soon as it arrives)
 
-- **Waiting for the owner:** `store/privacy.html` uploaded to
-  zinijo.com/qvoice/; a test of slices 17-20 on the phone; the Play upload
-  (internal testing, then the closed test, store/RELEASE.md); the
-  screenshots and the decisions under "Open decisions".
+- **Done by the owner (6 Oct 2026):** the privacy policy at
+  https://zinijo.com/qvoice/privacy.html, the GPL sources release
+  (`gpl-sources-1.13.8`), and the first Play upload: 1.0.0 (versionCode 1,
+  slice 20) in closed testing.
+- **Waiting for the owner:** 12 testers opted in (the 14 days run from
+  then), Play's pre-launch report for 1.0.0 (send me what it lists), a test
+  of 1.0.1 (slices 21-22) on the phone and its upload, whether the account
+  predates 13 Nov 2023 (no closed test needed then), the screenshots and the
+  decisions under "Open decisions".
 
 The plan below comes from Android's core app quality guidelines, Material
 3, Play's policies and listing guidance, and what users praise and
@@ -207,13 +212,11 @@ Everything Play asks for is drafted in `store/LISTING.md`, step by step in
 
 - Done: **the source on GitHub** (https://github.com/cyber-cyper/qvoice,
   pushed in slice 20, its build green; one commit per zip).
-- **The GPL components' source archives** in the release
-  `gpl-sources-1.13.8` (GPL-3.0 §6; NOTICE.md): the owner runs the "GPL
-  sources" workflow once from the Actions tab (this session can push code
-  but not create tags or releases; RELEASE.md step 1).
-- **The privacy policy page:** upload `store/privacy.html` so it opens at
-  https://zinijo.com/qvoice/privacy.html (the address in the app and for
-  Play Console).
+- Done: **the GPL components' source archives** in the release
+  `gpl-sources-1.13.8` (GPL-3.0 §6; NOTICE.md), started by the owner from
+  the Actions tab on 6 Oct 2026; both pinned hashes matched.
+- Done: **the privacy policy page** at https://zinijo.com/qvoice/privacy.html
+  (`store/privacy.html`; the address in the app and in Play Console).
 - **Foreground service declaration** (Play Console → App content →
   Foreground service permissions): "Media playback", for reading aloud with
   the screen off. The text to paste and what the ~30 s video must show are
@@ -228,7 +231,7 @@ Everything Play asks for is drafted in `store/LISTING.md`, step by step in
 - Screenshots (store/LISTING.md): at least 4 at 1080 px or more to be
   eligible for Play's recommendations. Check "QVoice" isn't a conflicting
   name on Play.
-- versionCode stays 1 for the first upload; raise it only on the owner's say.
+- Every upload raises the versionCode by 1 and the versionName's last number (D-037); the owner says when.
 
 ## Open decisions (owner)
 

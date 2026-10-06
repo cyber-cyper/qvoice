@@ -330,10 +330,14 @@ matching the wallpaper, and Play screenshots then show what every user sees.
 All Material 3 roles are set explicitly (surface containers included) and
 every text pair meets WCAG AA.
 
-**D-037 Version policy: versionCode 1 until the owner says otherwise.**
-versionName 1.0.0 for the first Play upload; debug builds carry the slice as
-a suffix. Play refuses a repeated versionCode, so any later upload needs the
-owner's go-ahead to raise it.
+**D-037 Version policy: one versionCode per Play upload, on the owner's
+go-ahead.** versionCode 1 / versionName 1.0.0 was the first upload (closed
+testing, 6 October 2026, from slice 20). Every later upload raises the
+versionCode by exactly 1 (Play refuses a code it has seen, uploaded or not
+released) and the versionName's last number with it (1.0.1, 1.0.2 …), so
+testers, reviews and feedback emails say which build they mean; a bigger
+step (1.1.0) is the owner's call for a production release. Debug builds
+carry the slice as a suffix.
 
 **D-038 Speed on this phone decides labels, warnings and the automatic
 default.** Measured speed (SpeedBook: utterances of 1.5 s or more, smoothed,

@@ -170,6 +170,12 @@ listing would bring Tamil readers to an app with no Tamil voice, and Hindi
 voices are still slow on mid-range phones; both wait for fast Indian
 voices (docs/BACKLOG.md). Keep the name "QVoice" untranslated.
 
+## Release notes for 1.0.1 (500 max)
+
+```
+Help is built in: tap ? on the home screen for answers to common questions, with buttons that take you straight to the right setting. QVoice now warns when battery saving would stop it reading with the screen off, and shows "Preparing the voice…" while a voice gets ready, so you know it's coming.
+```
+
 ## Before the first upload
 
 - Source pushed to https://github.com/cyber-cyper/qvoice (`qvoice.sourceUrl`

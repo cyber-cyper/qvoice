@@ -513,7 +513,7 @@ folder): `Remove-Item -ErrorAction SilentlyContinue store\privacy-policy.html`
 
 1. Home → ⓘ (About). Under the logo: **Send feedback** and **Rate QVoice**.
 2. **Send feedback**: your mail app opens a new email to
-   support@zinijo.com, subject "QVoice feedback (1.0.0-slice20)", the
+   support@zinijo.com, subject "QVoice feedback (1.0.1-slice22)", the
    cursor above a "Details for QVoice support" block with the app and
    Android versions, the phone and the preferred engine. Discard it (or
    send yourself a test).
@@ -580,7 +580,7 @@ $adb = "C:\Users\Public\sdk\platform-tools\adb.exe"
 Then install as usual (`gradle test installDebug`).
 
 1. The launcher shows **QVoice debug**; About shows version
-   1.0.0-slice22 (or later).
+   1.0.1-slice22 (or later).
 2. Android's text-to-speech settings list **QVoice Text-to-Speech
    (debug)**; choose it as the preferred engine (or keep Google's until
    the Play version is installed).

@@ -14,11 +14,12 @@ if a button is named a little differently, the order still holds.
 | 5. Closed test: 12 testers, 14 days | you and your testers | 14 days |
 | 6. Production | you | 1 day of review |
 
-versionCode stays 1 for the first upload (your rule). The same bundle goes
-from internal testing to the closed test to production without a new
-upload. Play refuses a second upload with the same versionCode, so a fixed
-or improved build during the test needs versionCode 2 (then 3…): tell me
-and I raise it.
+Version numbers (D-037): every upload to Play needs a versionCode Play
+hasn't seen, so each one goes up by exactly 1, with the versionName's last
+number. 1 (1.0.0) is the first upload, in closed testing since 6 October
+2026; the next is 2 (1.0.1). The same bundle can move between tracks
+(internal → closed → production) without a new upload or number. Tell me
+when you upload, and I raise the number for the one after.
 
 ## 1. Publish the source (done)
 

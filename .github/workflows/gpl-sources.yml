@@ -20,7 +20,9 @@ permissions:
 
 jobs:
   mirror:
-    runs-on: ubuntu-latest
+    # Pinned rather than "latest" (which moves to Ubuntu 26 on 19 Oct 2026):
+    # the build changes only when this line does.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Download and check the archives

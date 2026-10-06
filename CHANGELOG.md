@@ -29,9 +29,10 @@ raise it; debug builds show the slice after the version ("1.0.0-slice20").
   green throughout: unit tests, the debug APK, the R8-shrunk release build
   and lint, which is now a gate (errors fail the build).
 - **The GPL components' sources** (eSpeak NG, piper-phonemize, sherpa-onnx
-  1.13.8) are mirrored into the repository's release `gpl-sources-1.13.8`
+  1.13.8) get mirrored into the repository's release `gpl-sources-1.13.8`
   by a workflow that checks them against the hashes sherpa-onnx pins, as
-  GPL-3.0 asks for as long as the app is distributed (NOTICE.md).
+  GPL-3.0 asks for as long as the app is distributed (NOTICE.md). One
+  click from the owner starts it (Actions → GPL sources → Run workflow).
 
 ## 1.0.0 — slice 19: read copied text — 2026-10-05 (versionCode 1)
 

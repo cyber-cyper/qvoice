@@ -216,9 +216,11 @@ Everything Play asks for is drafted in `store/LISTING.md`, step by step in
 `store/RELEASE.md`. What remains needs the owner:
 
 - Done: **the source on GitHub** (https://github.com/cyber-cyper/qvoice,
-  pushed in slice 20, its build green) and **the GPL components' source
-  archives** in its release `gpl-sources-1.13.8` (GPL-3.0 §6; NOTICE.md).
-  Each Play build's commit gets a tag (`v1.0.0-build1` for versionCode 1).
+  pushed in slice 20, its build green; one commit per zip).
+- **The GPL components' source archives** in the release
+  `gpl-sources-1.13.8` (GPL-3.0 §6; NOTICE.md): the owner runs the "GPL
+  sources" workflow once from the Actions tab (this session can push code
+  but not create tags or releases; RELEASE.md step 1).
 - **The privacy policy page:** upload `store/privacy.html` so it opens at
   https://zinijo.com/qvoice/privacy.html (the address in the app and for
   Play Console).

@@ -25,11 +25,20 @@ and I raise it.
 The app contains eSpeak NG (GPL-3.0), so the source of every build on Play
 must be public, and release builds refuse to run until `qvoice.sourceUrl`
 names it (`app/build.gradle.kts`). Done in slice 20: the source is at
-https://github.com/cyber-cyper/qvoice (`qvoice.sourceUrl`), GitHub builds and
-tests every push, the GPL components' sources are in its release
-`gpl-sources-1.13.8`, and the commit of each Play build gets a tag
-(`v1.0.0-build1` for versionCode 1). I push every slice there; you keep
-extracting zips as usual.
+https://github.com/cyber-cyper/qvoice (`qvoice.sourceUrl`), and GitHub builds
+and tests every push. I push every slice there (one commit per zip); you
+keep extracting zips as usual.
+
+**One click from you, once, before the first upload:** the copies of the
+GPL components' sources (eSpeak NG, piper-phonemize, sherpa-onnx 1.13.8)
+that must stay available next to the app. This session may push code but
+not create releases, so the release is yours to start:
+
+1. github.com/cyber-cyper/qvoice → **Actions** → **GPL sources** (left).
+2. **Run workflow** → **Run workflow** (branch main).
+3. After about a minute: **Releases** (right side of the repository's main
+   page) shows "Sources of the GPL components (sherpa-onnx 1.13.8)" with
+   four files.
 
 If GitHub ever refuses Claude's pushes, the Claude GitHub App needs
 access: https://github.com/apps/claude/installations/select_target →

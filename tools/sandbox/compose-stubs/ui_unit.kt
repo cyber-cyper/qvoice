@@ -11,6 +11,9 @@ import androidx.compose.runtime.Stable
 @Stable inline val Int.dp: Dp get() = Dp(this.toFloat())
 @Stable inline val Double.dp: Dp get() = Dp(this.toFloat())
 @Stable inline val Float.dp: Dp get() = Dp(this)
-@JvmInline value class TextUnit(val packedValue: Long) { companion object { val Unspecified: TextUnit get() = TODO() } }
+@JvmInline value class TextUnit(val packedValue: Long) {
+    inline operator fun times(other: Float): TextUnit = TextUnit(packedValue)
+    companion object { val Unspecified: TextUnit get() = TODO() }
+}
 enum class LayoutDirection { Ltr, Rtl }
 @Immutable @JvmInline value class DpOffset(val packedValue: Long)

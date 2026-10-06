@@ -25,7 +25,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
@@ -37,6 +39,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,14 +65,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.riniso.qvoice.R
 import com.riniso.qvoice.reader.ReadAloud
 import com.riniso.qvoice.reader.ReaderText
 import com.riniso.qvoice.reader.formatSleepTime
+import com.riniso.qvoice.settings.ReaderTextSize
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -95,6 +103,9 @@ fun ReaderScreen(
     voicesFor: (Locale) -> List<VoiceRow>,
     /** Makes the voice its language's default and restarts the paragraph with it. */
     onChooseVoice: (VoiceRow) -> Unit,
+    /** The text size on top of the phone's (ReaderTextSize.STEPS), and its change. */
+    textScale: Float,
+    onTextScale: (Float) -> Unit,
 ) {
     val state by reader.state.collectAsStateWithLifecycle()
     // "Read something else" forgets the text (ReaderMemory deletes it); until
@@ -115,17 +126,17 @@ fun ReaderScreen(
                     if (state.paragraphs.isNotEmpty()) {
                         VoiceButton(reader.localeOf(state.index), voicesFor, onChooseVoice, onOpenVoices)
                         SleepTimerButton(state.sleepAt, onSet = reader::setSleepTimer)
-                        // Back to the paste field, for something else to read
-                        // (which also forgets the text: ReaderMemory).
-                        IconButton(
-                            onClick = {
+                        ReaderMenu(
+                            textScale = textScale,
+                            onTextScale = onTextScale,
+                            // Back to the paste field, for something else to read
+                            // (which also forgets the text: ReaderMemory).
+                            onReadSomethingElse = {
                                 onDismissNotice()
                                 cleared = state
                                 reader.load("", play = false)
                             },
-                        ) {
-                            Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.reader_new_text))
-                        }
+                        )
                     }
                 },
             )
@@ -144,13 +155,13 @@ fun ReaderScreen(
                 onReadClipboardAnyway = onReadClipboardAnyway,
                 onBackToPrevious = cleared?.let { previous ->
                     {
-                        reader.restore(previous.paragraphs, previous.index, previous.truncated)
+                        reader.restore(previous.paragraphs, previous.index, previous.sentence, previous.truncated)
                         cleared = null
                     }
                 },
             )
         } else {
-            Paragraphs(state, notice, onDismissNotice, onReadClipboardAnyway, padding, reader, onOpenVoices)
+            Paragraphs(state, notice, onDismissNotice, onReadClipboardAnyway, padding, reader, onOpenVoices, textScale)
         }
     }
 }
@@ -164,6 +175,7 @@ private fun Paragraphs(
     padding: PaddingValues,
     reader: ReadAloud,
     onOpenVoices: () -> Unit,
+    textScale: Float,
 ) {
     val list = rememberLazyListState()
     val playing = state.status == ReadAloud.Status.PLAYING
@@ -174,9 +186,23 @@ private fun Paragraphs(
     LaunchedEffect(state.paragraphs) {
         list.scrollToItem(if (state.index == 0 || state.problem != null) 0 else state.index + NOTICE_ROWS)
     }
-    // Follow the reading, but only while reading: paused, the list is the user's to scroll.
-    LaunchedEffect(state.index, playing) {
-        if (playing) list.animateScrollToItem(state.index + NOTICE_ROWS)
+    // Each paragraph's laid-out text, for finding a sentence's line in it.
+    val layouts = remember(state.paragraphs) { HashMap<Int, TextLayoutResult>() }
+    // Follow the reading, but only while reading: paused, the list is the
+    // user's to scroll. The sentence being read stays near the top with one
+    // line before it, so a paragraph taller than the screen (long, or at a
+    // large text size) never reads on below the visible part.
+    LaunchedEffect(state.index, state.sentence, playing) {
+        if (!playing) return@LaunchedEffect
+        val layout = layouts[state.index]
+        val start = ReaderText.sentenceRanges(state.paragraphs[state.index]).getOrNull(state.sentence)?.first ?: 0
+        val offset = if (layout == null || start == 0) {
+            0
+        } else {
+            val line = layout.getLineForOffset(start)
+            if (line == 0) 0 else layout.getLineTop(line - 1).toInt()
+        }
+        list.animateScrollToItem(state.index + NOTICE_ROWS, scrollOffset = offset)
     }
     // A share that couldn't be read: its notice is at the top.
     LaunchedEffect(notice) {
@@ -184,6 +210,12 @@ private fun Paragraphs(
     }
     val nowReading = stringResource(R.string.reader_now_reading)
     val readFromHere = stringResource(R.string.reader_read_from_here)
+    // The reader's own size on top of the phone's font size (both are sp);
+    // the line height grows with it, so large text keeps its spacing.
+    val body = MaterialTheme.typography.bodyLarge
+    // The sentence being read, marked inside its highlighted paragraph:
+    // at least 4.5:1 for the text on it in both themes (Theme.kt colours).
+    val sentenceMark = MaterialTheme.colorScheme.inversePrimary
     BoxWithConstraints(Modifier.fillMaxSize()) {
         LazyColumn(
             state = list,
@@ -196,9 +228,24 @@ private fun Paragraphs(
             item { Notice(state, notice, onDismissNotice, onReadClipboardAnyway, reader, onOpenVoices) }
             itemsIndexed(state.paragraphs) { index, paragraph ->
                 val current = index == state.index && state.status != ReadAloud.Status.FINISHED
+                val ranges = remember(paragraph) { ReaderText.sentenceRanges(paragraph) }
+                // A paragraph of one sentence needs no mark inside its highlight.
+                val marked = ranges.getOrNull(state.sentence)?.takeIf { current && ranges.size > 1 }
                 Text(
-                    paragraph,
-                    style = MaterialTheme.typography.bodyLarge,
+                    // spanStyles named: AnnotatedString(text) alone would be
+                    // ambiguous between its two constructors.
+                    AnnotatedString(
+                        paragraph,
+                        spanStyles = if (marked == null) {
+                            emptyList()
+                        } else {
+                            listOf(AnnotatedString.Range(SpanStyle(background = sentenceMark), marked.first, marked.last + 1))
+                        },
+                    ),
+                    onTextLayout = { layouts[index] = it },
+                    style = body,
+                    fontSize = body.fontSize * textScale,
+                    lineHeight = body.lineHeight * textScale,
                     color = if (current) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -306,7 +353,7 @@ private fun ReaderControls(state: ReadAloud.State, reader: ReadAloud) {
             // A ring around the button while the voice prepares the paragraph.
             if (preparingShown) CircularProgressIndicator(modifier = Modifier.size(60.dp), strokeWidth = 3.dp)
         }
-        IconButton(onClick = { reader.next() }, enabled = state.index < state.paragraphs.lastIndex) {
+        IconButton(onClick = { reader.next() }, enabled = !state.lastSentence) {
             Icon(painterResource(R.drawable.ic_skip_next), contentDescription = stringResource(R.string.reader_next))
         }
         Spacer(Modifier.weight(1f))
@@ -435,6 +482,59 @@ private fun VoiceChoiceRow(row: VoiceRow, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             row.speed?.let { SpeedLabel(it) }
+        }
+    }
+}
+
+/**
+ * ⋮: the text size (four steps, the current one ticked) and "Read something
+ * else". The latter lives here rather than as an icon in the bar: it forgets
+ * the text (ReaderMemory), so it shouldn't sit one stray tap away.
+ */
+@Composable
+private fun ReaderMenu(textScale: Float, onTextScale: (Float) -> Unit, onReadSomethingElse: () -> Unit) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    val sizeNames = listOf(
+        stringResource(R.string.reader_text_size_normal),
+        stringResource(R.string.reader_text_size_large),
+        stringResource(R.string.reader_text_size_larger),
+        stringResource(R.string.reader_text_size_largest),
+    )
+    val selected = stringResource(R.string.reader_text_size_selected)
+    Box { // the menu opens at the button
+        IconButton(onClick = { open = true }) {
+            Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.reader_menu))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            Text(
+                stringResource(R.string.reader_text_size),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp).semantics { heading() },
+            )
+            ReaderTextSize.STEPS.forEachIndexed { i, step ->
+                val isCurrent = step == textScale
+                DropdownMenuItem(
+                    text = { Text(sizeNames[i]) },
+                    onClick = {
+                        open = false
+                        onTextScale(step)
+                    },
+                    leadingIcon = {
+                        // A tick on the current size; the same space empty on the others.
+                        if (isCurrent) Icon(Icons.Filled.Check, contentDescription = null) else Spacer(Modifier.size(24.dp))
+                    },
+                    modifier = Modifier.semantics { if (isCurrent) stateDescription = selected },
+                )
+            }
+            HorizontalDivider()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.reader_new_text)) },
+                onClick = {
+                    open = false
+                    onReadSomethingElse()
+                },
+                leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+            )
         }
     }
 }

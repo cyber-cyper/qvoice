@@ -13,7 +13,7 @@ the About screen's privacy text together, then upload the page again.
 | Data | Where it goes | Kept |
 |---|---|---|
 | Text other apps send the engine (TalkBack, readers, maps) | turned into audio in memory | never |
-| Text in the reader (Read aloud, Share, .txt files, Paste, Read copied text) | shown and read on the phone | the last text and paragraph only, in `noBackupFilesDir/reader/` (slice 18): replaced by the next text, deleted by "Read something else", clearing storage or uninstalling |
+| Text in the reader (Read aloud, Share, .txt files, Paste, Read copied text) | shown and read on the phone | the last text and the place in it (paragraph, sentence) only, in `noBackupFilesDir/reader/` (`last.txt`, `place.txt`; slices 18, 24): replaced by the next text, deleted by "Read something else", clearing storage or uninstalling |
 | Clipboard | read only on Paste or the Read copied text shortcut; the shortcut skips clips marked sensitive (slice 19) | as reader text |
 | Notification, lock screen, media session | position only ("Paragraph 3 of 12") | while the session lasts |
 | Settings (`qvoice_settings`) | the phone; Android backup if on | until cleared |

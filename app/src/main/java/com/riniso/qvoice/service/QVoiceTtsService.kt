@@ -207,6 +207,10 @@ class QVoiceTtsService : TextToSpeechService() {
 
     private fun synthesize(request: SynthesisRequest, callback: SynthesisCallback, job: SynthJob) {
         val text = request.charSequenceText?.toString().orEmpty()
+        // QVoice's reader marks a sentence it queues while another plays: no
+        // fast-start cut for it (SpeechModel.generate's opening). Any client
+        // may set it; nobody else is affected.
+        val opening = request.params?.getBoolean(PARAM_QUEUED_AHEAD, false) != true
         awaitVoices()
         val caller = callerOf(request)
         val chosen = when (val r = graph.selector.resolve(request.voiceName, request.language, request.country, text)) {
@@ -263,7 +267,7 @@ class QVoiceTtsService : TextToSpeechService() {
                     // On ReadAhead's thread. EngineHost's lock stays with this
                     // thread, and run() returns only after that thread ended,
                     // so the model can't be released while it generates.
-                    produce = { sink -> model.generate(text, sid, prosody.modelSpeed, exposed.language, sink) },
+                    produce = { sink -> model.generate(text, sid, prosody.modelSpeed, exposed.language, opening, sink) },
                     // On this thread, at playback speed (audioAvailable blocks).
                     consume = { samples ->
                         if (job.stopped) {
@@ -400,6 +404,12 @@ class QVoiceTtsService : TextToSpeechService() {
     companion object {
         private const val TAG = "QVoice.Tts"
         private const val VOICE_SCAN_WAIT_MS = 1_500L
+
+        /**
+         * Request param (Boolean): this text was queued while another one
+         * plays, so nobody waits for its first sound (D-055).
+         */
+        const val PARAM_QUEUED_AHEAD = "com.riniso.qvoice.QUEUED_AHEAD"
 
         /**
          * How far generation may run ahead of playback. Plenty to ride out a

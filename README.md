@@ -13,7 +13,7 @@ Marmalade TTS, AudioLab) into one clean app built on a single speech runtime,
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for what was taken from each and
 why.
 
-**Status:** version 1.0.1 (versionCode 2), slice 22 of the
+**Status:** version 1.0.1 (versionCode 2), slice 24 of the
 [backlog](docs/BACKLOG.md): the system engine with a built-in English voice
 (8 speakers, read straight from the APK), generation that runs ahead of
 playback, speech rates up to 6× with pitch, a voice library of seven

@@ -50,6 +50,28 @@ object ReaderText {
     }
 
     /**
+     * Where [paragraph]'s sentences are, as character ranges in reading
+     * order: never empty, gaps between sentences (their spaces) left out.
+     * TextChunker's rules decide (". ! ? …" and their equivalents in other
+     * scripts, but not after "Dr.", "U.S." or "3."), so the reader speaks
+     * and highlights the same sentences the engine would have made of the
+     * paragraph. Prepared paragraphs hold single spaces only, which is what
+     * TextChunker gives each sentence back, so every sentence is found in
+     * order; the whole paragraph as one sentence covers anything else.
+     */
+    fun sentenceRanges(paragraph: String): List<IntRange> {
+        val out = ArrayList<IntRange>()
+        var from = 0
+        for (sentence in TextChunker.sentences(paragraph)) {
+            val start = paragraph.indexOf(sentence, from)
+            if (start < 0) return listOf(paragraph.indices)
+            out += start until start + sentence.length
+            from = start + sentence.length
+        }
+        return if (out.isEmpty()) listOf(paragraph.indices) else out
+    }
+
+    /**
      * The start of [paragraph] for a one-line preview (Home's Read aloud
      * card): whole words, at most [maxChars] characters, "…" when cut.
      */

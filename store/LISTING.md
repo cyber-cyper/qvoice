@@ -17,7 +17,7 @@ title; this one is fine. The launcher shows the short name "QVoice".)
 Natural-sounding voices that work offline in every app. Private, no ads.
 ```
 
-**Full description** (4000 max, about 2,680 used):
+**Full description** (4000 max, about 2,750 used):
 
 ```
 QVoice gives your phone natural-sounding voices that work completely offline. Set it as your phone's text-to-speech engine and every app that reads aloud — screen readers, e-book and news readers, maps, translators, learning apps — speaks with a QVoice voice.
@@ -30,7 +30,7 @@ Why QVoice
 • Fast where it matters: speech starts in a fraction of a second, keeps up with long texts, and stops the moment you ask.
 • Knows your phone: QVoice measures how fast each voice runs on your phone and tells you before you download one that would be too slow.
 • Made for fast listening: speech rates up to 6× for screen-reader users, with the voice's natural pitch kept; pitch can be changed too.
-• Read aloud anywhere: select text in any app and choose Read aloud, share text or a text file to QVoice, or copy text and tap "Read copied text" on QVoice's icon, and it reads it to you, paragraph by paragraph. It keeps reading with the screen off, with controls on the lock screen and on your headset, a sleep timer for bedtime listening, and it picks up where you stopped.
+• Read aloud anywhere: select text in any app and choose Read aloud, share text or a text file to QVoice, or copy text and tap "Read copied text" on QVoice's icon, and it reads it to you sentence by sentence, marking each one as it goes. Skip back a sentence, make the text bigger, keep listening with the screen off, with controls on the lock screen and on your headset, a sleep timer for bedtime listening, and it picks up where you stopped.
 
 More voices to download (free)
 • Fast English voices (US and UK) that suit any phone.
@@ -56,7 +56,7 @@ Claims check: every line above is true of the current build ("Read aloud
 anywhere" since slice 9, with the screen off and lock screen and headset
 controls since slice 10, the sleep timer since slice 12, text files since
 slice 16, "picks up where you stopped" since slice 18, "Read copied text"
-since slice 19). "Knows your
+since slice 19, sentence by sentence and text size since slices 23-24). "Knows your
 phone" ships in 1.0.0 (slice 5), "fast listening" in slice 8 (rates up to
 6×; it says "natural pitch kept", not "clear at any speed": at 3×+ any voice
 gets hard to follow for untrained listeners). Keep "31 languages" tied to
@@ -173,7 +173,7 @@ voices (docs/BACKLOG.md). Keep the name "QVoice" untranslated.
 ## Release notes for 1.0.1 (500 max)
 
 ```
-Help is built in: tap ? on the home screen for answers to common questions, with buttons that take you straight to the right setting. QVoice now warns when battery saving would stop it reading with the screen off, and shows "Preparing the voice…" while a voice gets ready, so you know it's coming.
+The reader now follows the voice sentence by sentence: the sentence being read is marked, and Previous/Next skip one sentence. Text size in the reader's menu. Help is built in (tap ? on the home screen), QVoice warns when battery saving would stop it reading with the screen off, and shows "Preparing the voice…" while a voice gets ready.
 ```
 
 ## Before the first upload

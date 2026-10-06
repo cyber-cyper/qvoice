@@ -50,6 +50,9 @@ class ReaderActivity : ComponentActivity() {
     /** Bumped by every share, so a slow file read can't overwrite a newer share. */
     private var shares = 0
 
+    /** The reader's text size (QVoiceSettings.readerTextScale), read once and kept in step with the menu. */
+    private val textScale by lazy { mutableStateOf(graph.settings.readerTextScale) }
+
     /**
      * "Read copied text" is waiting for the window's focus: Android 10+ lets
      * only the focused app read the clipboard, and an activity being started
@@ -82,6 +85,11 @@ class ReaderActivity : ComponentActivity() {
                     onChooseVoice = { row ->
                         graph.settings.makeDefault(row.voiceName, row.languageTag, row.language)
                         graph.readAloud.voiceChanged()
+                    },
+                    textScale = textScale.value,
+                    onTextScale = { scale ->
+                        graph.settings.readerTextScale = scale
+                        textScale.value = scale
                     },
                 )
             }

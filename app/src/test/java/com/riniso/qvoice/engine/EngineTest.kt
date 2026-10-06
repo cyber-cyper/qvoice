@@ -21,7 +21,7 @@ class EngineTest {
         override val sampleRate = 24_000
         override val numSpeakers = 8
         @Volatile var released = false
-        override fun generate(text: String, sid: Int, speed: Float, language: String?, onChunk: (FloatArray) -> Boolean) {
+        override fun generate(text: String, sid: Int, speed: Float, language: String?, opening: Boolean, onChunk: (FloatArray) -> Boolean) {
             check(!released) { "generate on released model $name" }
             onChunk(FloatArray(4))
         }

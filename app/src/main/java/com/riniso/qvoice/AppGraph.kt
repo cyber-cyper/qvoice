@@ -151,7 +151,7 @@ class AppGraph(context: Context) {
             // never shows empty first and jumps a moment later. The engine
             // never pays for it: the TTS service doesn't touch the reader.
             val memory = readerMemory
-            memory.restore()?.let { reader.restore(it.paragraphs, it.index, it.truncated) }
+            memory.restore()?.let { reader.restore(it.paragraphs, it.index, it.sentence, it.truncated) }
             // Reading on with the screen off or in another app needs the media
             // service: started when reading starts, it then follows the reader
             // by itself until the listening session ends. Dispatchers.Main

@@ -82,6 +82,16 @@ class QVoiceSettings(context: Context) : VoiceDefaults, SpeedBook.Store {
         }
 
     /** Licences with use restrictions (see catalog.Licences) the user has accepted. */
+    /**
+     * The reader's text size, on top of the phone's own font size
+     * (ReaderTextSize.STEPS); in the backed-up settings, like the speed.
+     */
+    var readerTextScale: Float
+        get() = ReaderTextSize.nearest(prefs.getFloat(KEY_READER_TEXT_SCALE, 1f))
+        set(value) {
+            prefs.edit().putFloat(KEY_READER_TEXT_SCALE, ReaderTextSize.nearest(value)).apply()
+        }
+
     fun hasAccepted(licence: String): Boolean = prefs.getBoolean(KEY_ACCEPTED_PREFIX + licence, false)
 
     fun accept(licence: String) {
@@ -99,5 +109,6 @@ class QVoiceSettings(context: Context) : VoiceDefaults, SpeedBook.Store {
         private const val KEY_ENGINE_THREADS = "engine_threads"
         private const val KEY_SPEED_PREFIX = "speed."
         private const val KEY_READER_RATE = "reader_rate"
+        private const val KEY_READER_TEXT_SCALE = "reader_text_scale"
     }
 }

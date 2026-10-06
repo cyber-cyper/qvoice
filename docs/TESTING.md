@@ -9,7 +9,7 @@ open the project, then the green ▶ Run button installs it on the phone).
 1. Unpack over the project (the download folder and the zip's name change):
 
    ```powershell
-   Expand-Archive -Force "$env:USERPROFILE\Downloads\QVoice-slice22-src.zip" -DestinationPath "C:\Users\Public\QVoice-slice02-fix1-src"
+   Expand-Archive -Force "$env:USERPROFILE\Downloads\QVoice-slice24-src.zip" -DestinationPath "C:\Users\Public\QVoice-slice02-fix1-src"
    ```
 
 2. Unit tests, then build and install on the phone:
@@ -47,7 +47,7 @@ open the project, then the green ▶ Run button installs it on the phone).
 
 | Check | Command | Where it runs |
 |---|---|---|
-| Unit tests (233) | `gradle test` | your machine; also run in the authoring sandbox |
+| Unit tests (247) | `gradle test` | your machine; also run in the authoring sandbox |
 | Static project checks | `python tools/check_project.py` | anywhere with Python 3 |
 | Kotlin compile of all non-Compose code (incl. both view models and the reading service with its media session and notification), warnings as errors | (sandbox: kotlinc 2.2.10 against android-35, sherpa-onnx 1.13.8, Commons Compress 1.27.1) | authoring sandbox |
 | Compose screens compiled against stubs of the real Compose 1.9 / Material 3 1.3.2 API (made from the published API signature files), warnings as errors, then the Compose compiler plugin's checks | `bash tools/sandbox/verify.sh` step 4; stubs in `tools/sandbox/compose-stubs/` | authoring sandbox |
@@ -138,6 +138,15 @@ named test failed there.
 | Battery warning: the restricted bucket or the user's restriction, nothing else (2 mutations) | `everyOrdinaryBucketIsFine`, `theRestrictedBucketOrTheUsersRestrictionWarns` |
 | "Preparing": on after Play, a jump and between paragraphs; off at the first audio (2 mutations) | `theReaderSaysWhenTheVoiceIsStillPreparing` |
 | "Preparing": off on pause and on an engine error (2 mutations) | `nothingIsPreparingOnceReadingStops` |
+| Text size: any stored value lands on the closest step | `otherValuesGoToTheClosestStep` |
+| Sentences: next/previous by sentence; a paragraph tap starts it | `nextAndPreviousMoveBySentenceAndAParagraphTapStartsIt` |
+| Sentences: the sleep timer still ends at a paragraph's end, queueing inside it (2 mutations) | `theSleepTimerStillEndsAtAParagraphsEnd` |
+| Sentences: only a sentence queued while another plays is marked "ahead" (no fast-start cut) | `onlyASentenceQueuedWhileAnotherPlaysIsMarkedAhead` |
+| Sentences: a remembered sentence is clamped to its paragraph | `aRememberedPlaceOutsideTheTextIsClamped` |
+| Sentences: the notification has "next" until the last sentence | `theNotificationHasNextUntilTheLastSentence` |
+| Memory: a new place writes only the place; a place counts only for its own text (2 mutations) | `aNewTextIsSavedWithItsPlaceAndThenOnlyThePlace`, `aPlaceOfAnotherTextStartsAtTheTop` |
+| Memory store: a waiting text survives place-only writes; a place alone after a delete is dropped (2 mutations) | `aBurstOfChangesCostsOneWriteAndKeepsAWaitingText` |
+| Memory: a version-1 file is rewritten in two parts at once | `aVersionOneFileIsRewrittenInTwoPartsAtOnce` |
 
 The static checker was also run against copies with planted errors (seven
 in slice 1, a bogus member import in slice 2) and reported each.
@@ -513,7 +522,7 @@ folder): `Remove-Item -ErrorAction SilentlyContinue store\privacy-policy.html`
 
 1. Home → ⓘ (About). Under the logo: **Send feedback** and **Rate QVoice**.
 2. **Send feedback**: your mail app opens a new email to
-   support@zinijo.com, subject "QVoice feedback (1.0.1-slice22)", the
+   support@zinijo.com, subject "QVoice feedback (1.0.1-slice24)", the
    cursor above a "Details for QVoice support" block with the app and
    Android versions, the phone and the preferred engine. Discard it (or
    send yourself a test).
@@ -619,6 +628,36 @@ the voice).
    needs a moment.
 3. Home → Try it with the same large voice: "Preparing the voice…" under
    Speak until it speaks, then the timing line as before.
+
+## On-device test — slice 23 (text size)
+
+One minute.
+
+1. Reader with a text: ⋮ (top right) → **Text size** → **Largest**: the
+   text grows at once, line spacing with it; the tick moves. Back to
+   **Normal**.
+2. Close the reader and open it again: the size is kept.
+3. ⋮ → **Read something else**: the paste field, with **Back to the
+   previous text**.
+
+## On-device test — slice 24 (sentence by sentence)
+
+Three minutes. Paste a text with several sentences per paragraph (a news
+article works well).
+
+1. Play: the sentence being read has a darker mark inside the highlighted
+   paragraph, and moves with the voice. At **Largest** text size, a long
+   paragraph keeps the sentence being read in view.
+2. **Next** and **Previous** move one sentence (on screen, in the
+   notification and on headset buttons). Tapping a paragraph starts it from
+   the top.
+3. Change the speed while reading: the sentence starts over, not the
+   paragraph.
+4. Pause in the middle of a paragraph, close QVoice completely
+   (`adb shell am force-stop com.riniso.qvoice.debug`), open it, **Continue
+   listening**: it goes on from that sentence.
+5. Listen across a few sentences: no new pauses inside sentences (a long
+   sentence isn't cut at its first comma any more except right after Play).
 
 ## Not testable yet
 

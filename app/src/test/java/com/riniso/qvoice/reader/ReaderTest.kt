@@ -91,7 +91,7 @@ class ReaderTest {
 
     // ---- ReadAloud ----
 
-    private data class Call(val text: String, val id: String, val flush: Boolean, val rate: Float, val locale: Locale)
+    private data class Call(val text: String, val id: String, val flush: Boolean, val rate: Float, val locale: Locale, val ahead: Boolean)
 
     private class FakeSpeaker : Speaker {
         override var listener: Speaker.Listener? = null
@@ -100,9 +100,9 @@ class ReaderTest {
         var shutdowns = 0
         var voiceChanges = 0
         var refuse = false
-        override fun speak(text: String, utteranceId: String, flush: Boolean, rate: Float, locale: Locale): Boolean {
+        override fun speak(text: String, utteranceId: String, flush: Boolean, rate: Float, locale: Locale, ahead: Boolean): Boolean {
             if (refuse) return false
-            calls += Call(text, utteranceId, flush, rate, locale)
+            calls += Call(text, utteranceId, flush, rate, locale, ahead)
             return true
         }
         override fun stop() {
@@ -354,12 +354,146 @@ class ReaderTest {
         assertFalse(reader.state.value.preparing)
     }
 
+    // ---- Sentence by sentence ----
+
+    private val sentences = "First one. Second one.\n\nThird one. Fourth one.\n\nLast."
+
+    private fun place() = reader.state.value.let { it.index to it.sentence }
+
+    @Test
+    fun eachSentenceIsReadAloneAndTheMarkFollowsIt() {
+        reader.load(sentences, play = true)
+        assertEquals(listOf("First one." to true), speaker.calls.map { it.text to it.flush })
+        assertEquals(0 to 0, place())
+        started("First one.")
+        // The next sentence is queued ahead, inside the paragraph or across it.
+        assertEquals("Second one." to false, speaker.calls.last().let { it.text to it.flush })
+        started("Second one.")
+        assertEquals(0 to 1, place())
+        assertEquals("Third one.", speaker.calls.last().text)
+        started("Third one.")
+        assertEquals(1 to 0, place())
+        assertFalse(reader.state.value.lastSentence)
+        reader.jumpTo(2)
+        started("Last.")
+        assertTrue(reader.state.value.lastSentence)
+    }
+
+    @Test
+    fun onlyASentenceQueuedWhileAnotherPlaysIsMarkedAhead() {
+        reader.load(sentences, play = true)
+        assertFalse("Play: the first sound is waited for", speaker.calls.single().ahead)
+        started("First one.")
+        assertTrue("queued while the first plays", speaker.calls.last().ahead)
+        // Queued only when the one before ended (a screen reader's turn, or a
+        // late queue): someone waits for it.
+        val talkBackSpeaker = FakeSpeaker()
+        val withTalkBack = ReadAloud(talkBackSpeaker, FakeGuard(), localeFor = { Locale.US }, screenReaderOn = { true })
+        withTalkBack.load(sentences, play = true)
+        withTalkBack.onStart(talkBackSpeaker.calls.single().id)
+        withTalkBack.onDone(talkBackSpeaker.calls.single().id)
+        assertFalse(talkBackSpeaker.calls.last().ahead)
+    }
+
+    @Test
+    fun nextAndPreviousMoveBySentenceAndAParagraphTapStartsIt() {
+        reader.load(sentences, play = false)
+        reader.next()
+        assertEquals(0 to 1, place())
+        reader.next()
+        assertEquals("over the paragraph's end", 1 to 0, place())
+        reader.previous()
+        assertEquals(0 to 1, place())
+        assertEquals("not started yet: still ready", ReadAloud.Status.READY, reader.state.value.status)
+        reader.jumpTo(1)
+        assertEquals(1 to 0, place())
+        // While reading, a skip restarts the reading there at once.
+        reader.play()
+        started("Third one.")
+        reader.next()
+        assertEquals("Fourth one." to true, speaker.calls.last().let { it.text to it.flush })
+        reader.previous()
+        reader.previous()
+        assertEquals("Second one." to true, speaker.calls.last().let { it.text to it.flush })
+        // Nothing before the first sentence, nothing after the last.
+        reader.jumpTo(0)
+        reader.previous()
+        assertEquals(0 to 0, place())
+        reader.jumpTo(2)
+        reader.next()
+        assertEquals(2 to 0, place())
+    }
+
+    @Test
+    fun aNewSpeedRestartsTheSentenceNotTheParagraph() {
+        reader.load(sentences, play = true)
+        started("First one.")
+        started("Second one.")
+        reader.setRate(2f)
+        assertEquals("Second one." to true, speaker.calls.last().let { it.text to it.flush })
+    }
+
+    @Test
+    fun theSleepTimerStillEndsAtAParagraphsEnd() {
+        reader.load(sentences, play = true)
+        reader.setSleepTimer(15)
+        val end = 15 * 60_000L
+        now = end - 60_000 // the last minutes
+        started("First one.")
+        // Inside the paragraph the next sentence is still queued ahead...
+        assertEquals(1, speaker.calls.count { it.text == "Second one." })
+        now = end + 1_000 // ...and the time is up in the middle of the paragraph:
+        reader.onDone(lastIdOf("First one."))
+        assertEquals("the paragraph is read to its end", ReadAloud.Status.PLAYING, reader.state.value.status)
+        started("Second one.")
+        // At the paragraph's last sentence nothing is queued across its end.
+        assertEquals(0, speaker.calls.count { it.text == "Third one." })
+        reader.onDone(lastIdOf("Second one."))
+        val stopped = reader.state.value
+        assertEquals(ReadAloud.Status.PAUSED, stopped.status)
+        assertEquals("Play goes on with the next paragraph", 1 to 0, stopped.index to stopped.sentence)
+    }
+
+    @Test
+    fun theNotificationHasNextUntilTheLastSentence() {
+        reader.load("One.\n\nTwo. And three.", play = true)
+        reader.jumpTo(1)
+        started("Two.")
+        assertTrue("one more sentence in the last paragraph", NowPlaying.of(reader.state.value)!!.hasNext)
+        started("And three.")
+        assertFalse(NowPlaying.of(reader.state.value)!!.hasNext)
+        assertEquals(2, NowPlaying.of(reader.state.value)!!.paragraph)
+    }
+
+    @Test
+    fun aRememberedSentenceIsWhereReadingGoesOn() {
+        reader.restore(listOf("One.", "Two. Three. Four."), index = 1, sentence = 2, truncated = false)
+        assertEquals(1 to 2, place())
+        reader.play()
+        assertEquals("Four.", speaker.calls.single().text)
+    }
+
+    @Test
+    fun sentencesAreFoundWhereTheEngineWouldSplitThem() {
+        fun pieces(p: String) = ReaderText.sentenceRanges(p).map { p.substring(it.first, it.last + 1) }
+        assertEquals(listOf("Dr. Rao came at 3.45 p.m. today.", "He sat down!"), pieces("Dr. Rao came at 3.45 p.m. today. He sat down!"))
+        assertEquals(listOf("今天很好。", "明天见。"), pieces("今天很好。明天见。"))
+        assertEquals(listOf("नमस्ते।", "आप कैसे हैं?"), pieces("नमस्ते। आप कैसे हैं?"))
+        assertEquals(listOf("No full stop at all"), pieces("No full stop at all"))
+        // Every range lies inside the paragraph, in order, without overlaps.
+        val p = "One. Two? Three! Four…"
+        val ranges = ReaderText.sentenceRanges(p)
+        assertEquals(4, ranges.size)
+        assertTrue(ranges.zipWithNext().all { (a, b) -> a.last < b.first })
+        assertTrue(ranges.all { it.first >= 0 && it.last < p.length })
+    }
+
     // ---- A remembered text (ReaderMemory) ----
 
     @Test
     fun aRememberedTextComesBackReadyAtItsPlaceWithoutSpeaking() {
         reader.setRate(1.5f)
-        reader.restore(listOf("One.", "Two.", "Three."), index = 2, truncated = true)
+        reader.restore(listOf("One.", "Two.", "Three."), index = 2, sentence = 0, truncated = true)
         val s = reader.state.value
         assertEquals(ReadAloud.Status.READY, s.status)
         assertEquals(2, s.index)
@@ -376,18 +510,19 @@ class ReaderTest {
     @Test
     fun aRestoreNeverReplacesATextThatCameFirst() {
         reader.load(text, play = false)
-        reader.restore(listOf("Old."), index = 0, truncated = false)
+        reader.restore(listOf("Old."), index = 0, sentence = 0, truncated = false)
         assertEquals(listOf("One.", "Two.", "Three.", "Four."), reader.state.value.paragraphs)
         // Nor does an empty memory fill an empty reader.
         reader.load("", play = false)
-        reader.restore(emptyList(), index = 0, truncated = false)
+        reader.restore(emptyList(), index = 0, sentence = 0, truncated = false)
         assertEquals(ReadAloud.Status.EMPTY, reader.state.value.status)
     }
 
     @Test
     fun aRememberedPlaceOutsideTheTextIsClamped() {
-        reader.restore(listOf("One.", "Two."), index = 7, truncated = false)
+        reader.restore(listOf("One.", "Two."), index = 7, sentence = 5, truncated = false)
         assertEquals(1, reader.state.value.index)
+        assertEquals(0, reader.state.value.sentence) // "Two." has one sentence
     }
 
     // ---- The voice choice ----
@@ -551,20 +686,23 @@ class ReaderTest {
      * whatever the reader has queued: short pieces, one at a time.
      */
     @Test
-    fun aScreenReaderGetsATurnAfterEveryPiece() {
+    fun aScreenReaderGetsATurnAfterEverySentence() {
         val talkBackSpeaker = FakeSpeaker()
         val withTalkBack = ReadAloud(talkBackSpeaker, FakeGuard(), localeFor = { Locale.US }, screenReaderOn = { true })
-        val long = "This sentence has exactly fifty characters in it. ".repeat(20).trim()
+        val sentence = "This sentence has exactly fifty characters in it."
+        val long = "$sentence ".repeat(20).trim()
         withTalkBack.load("$long\n\nLast.", play = true)
         val pieces = withTalkBack.state.value.paragraphs
         assertTrue(pieces.size > 3)
         assertTrue(pieces.all { it.length <= ReaderText.SCREEN_READER_PARAGRAPH })
-
+        // One sentence at a time, and nothing queued ahead: TalkBack gets a
+        // turn after every sentence.
+        assertEquals(sentence, talkBackSpeaker.calls.single().text)
         withTalkBack.onStart(talkBackSpeaker.calls.single().id)
         assertEquals("nothing queued ahead", 1, talkBackSpeaker.calls.size)
         withTalkBack.onDone(talkBackSpeaker.calls.single().id)
         assertEquals(2, talkBackSpeaker.calls.size)
-        assertEquals(pieces[1] to false, talkBackSpeaker.calls.last().let { it.text to it.flush })
+        assertEquals(sentence to false, talkBackSpeaker.calls.last().let { it.text to it.flush })
         assertEquals(ReadAloud.Status.PLAYING, withTalkBack.state.value.status)
     }
 }

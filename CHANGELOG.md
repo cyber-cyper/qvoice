@@ -3,7 +3,42 @@
 Version numbers: one versionCode per Play upload, on the owner's go-ahead,
 with the versionName's last number (D-037). versionCode 1 (1.0.0) was the
 first upload, to closed testing on 6 October 2026, built from slice 20.
-Debug builds show the slice after the version ("1.0.1-slice22").
+Debug builds show the slice after the version ("1.0.1-slice24").
+
+## 1.0.1 — slice 24: sentence by sentence — 2026-10-06 (versionCode 2)
+
+- **The reader follows the voice sentence by sentence:** the sentence being
+  read is marked inside its highlighted paragraph, and the list keeps it in
+  view (one line of context above it), also in paragraphs taller than the
+  screen at a large text size.
+- **Previous and next go by sentence** (on screen, in the notification, on
+  the lock screen and on headset buttons): going back to the sentence just
+  missed is one tap. Tapping a paragraph still starts it from the top; the
+  notification still counts paragraphs ("Paragraph 3 of 12").
+- **A new speed or voice restarts the sentence, not the whole paragraph.**
+- **Continue listening picks up at the sentence**, not at the paragraph's
+  start. The memory is now two small parts, the text (written once) and the
+  place (a few bytes per sentence), instead of rewriting the whole text at
+  every step; texts remembered by earlier test builds are still read.
+- The sleep timer still ends at a paragraph's end, and TalkBack still gets
+  a turn between sentences (better than before: between every sentence
+  rather than every 300 characters).
+- No new pauses: the engine is told when a sentence is queued while another
+  plays, so its fast-start cut (which splits a long opening sentence at a
+  comma to make the first sound come sooner) is used only when someone is
+  actually waiting.
+- Tests: 247 (was 235), 11 new guards proven by mutation.
+
+## 1.0.1 — slice 23: text size in the reader — 2026-10-06 (versionCode 2)
+
+- **Text size** in the reader's ⋮ menu: Normal, Large, Larger, Largest
+  (100% to 175%), on top of the phone's own font size, remembered (and in
+  the device backup, like the reading speed). The line spacing grows with
+  it.
+- **Read something else** moved into the same menu: it forgets the text, so
+  it shouldn't sit one stray tap away in the top bar. ("Back to the
+  previous text" still undoes it.)
+- Tests: 235 (was 233), 1 new guard proven by mutation.
 
 ## 1.0.1 — slice 22: "Preparing the voice…" — 2026-10-06 (versionCode 2)
 

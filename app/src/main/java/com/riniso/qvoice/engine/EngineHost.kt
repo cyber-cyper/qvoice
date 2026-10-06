@@ -21,8 +21,13 @@ interface SpeechModel {
      * @param language ISO-639-1 code of the text, for models that take the
      *   language per request (Supertonic); ignored by the others, which fix it
      *   when loaded (see EngineHost variants).
+     * @param opening whether someone waits for this text's first sound: then
+     *   its first sentences are cut short for fast first audio (TextChunker's
+     *   opening). False for a text queued while another plays (the reader's
+     *   next sentence): it is ready in time anyway, and the cut would only
+     *   add a pause inside a sentence.
      */
-    fun generate(text: String, sid: Int, speed: Float, language: String?, onChunk: (FloatArray) -> Boolean)
+    fun generate(text: String, sid: Int, speed: Float, language: String?, opening: Boolean = true, onChunk: (FloatArray) -> Boolean)
 
     /** Frees native memory. Never called while [generate] is running (see [EngineHost]). */
     fun release()

@@ -19,9 +19,12 @@ data class NowPlaying(
     val problem: ReadAloud.Problem?,
     /** When the sleep timer stops reading (ReadAloud.State.sleepAt), or null. */
     val sleepAt: Long? = null,
+    /**
+     * "Next" (the next sentence) does something: the media controls leave it
+     * out otherwise. Only the text's last sentence has none.
+     */
+    val hasNext: Boolean = paragraph < paragraphs,
 ) {
-    /** "Next" does something (the media controls leave it out otherwise). */
-    val hasNext: Boolean get() = paragraph < paragraphs
 
     companion object {
         /**
@@ -38,6 +41,7 @@ data class NowPlaying(
                 finished = state.status == ReadAloud.Status.FINISHED,
                 problem = state.problem,
                 sleepAt = state.sleepAt,
+                hasNext = !state.lastSentence,
             )
         }
 

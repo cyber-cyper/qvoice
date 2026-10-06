@@ -33,7 +33,7 @@ class SherpaSpeechModel(
      * 2nd of 5 sentences stops after 2). Each call also returns the whole
      * chunk as GeneratedAudio, which is ignored — it's already streamed.
      */
-    override fun generate(text: String, sid: Int, speed: Float, language: String?, onChunk: (FloatArray) -> Boolean) {
+    override fun generate(text: String, sid: Int, speed: Float, language: String?, opening: Boolean, onChunk: (FloatArray) -> Boolean) {
         // Supertonic takes its language per request (GenerationConfig.extra
         // "lang", ISO-639-1); the other families fix it when loaded.
         val config = if (family == VoiceFamily.SUPERTONIC) {
@@ -42,7 +42,8 @@ class SherpaSpeechModel(
             null
         }
         val maxChars = if (config != null) TextChunker.DEFAULT_MAX_CHARS else TextChunker.STREAMING_MAX_CHARS
-        for (chunk in TextChunker.split(text, maxChars)) {
+        val chunks = if (opening) TextChunker.split(text, maxChars) else TextChunker.group(text, maxChars)
+        for (chunk in chunks) {
             // Never a lambda here — see SherpaChunkCallback.
             val callback = SherpaChunkCallback(onChunk)
             if (config != null) {

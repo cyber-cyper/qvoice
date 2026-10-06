@@ -1,6 +1,6 @@
 # QVoice backlog
 
-Each slice is small, self-contained and shippable. Status as of slice 22
+Each slice is small, self-contained and shippable. Status as of slice 24
 (version 1.0.1, versionCode 2; 1.0.0, versionCode 1, is in closed testing).
 
 ## Done
@@ -107,9 +107,16 @@ Each slice is small, self-contained and shippable. Status as of slice 22
   screen with the questions people ask most and buttons that act on them;
   a Home card only while Android restricts QVoice in the background
   (D-053). 231 unit tests.
-- **Slice 22 — "Preparing the voice…"** (1.0.0). A cue in the reader and
+- **Slice 22 — "Preparing the voice…"** (1.0.1). A cue in the reader and
   Try it while the voice prepares, shown only for waits over 0.4 s
   (D-054). 233 unit tests.
+- **Slice 23 — text size in the reader** (1.0.1). Four steps in the
+  reader's ⋮ menu, remembered; "Read something else" moved there. 235
+  unit tests.
+- **Slice 24 — sentence by sentence** (1.0.1). Sentences as the reader's
+  unit: marked as read, skipped one at a time, resumed exactly; the engine
+  skips its fast-start cut for sentences queued ahead; the memory in two
+  parts (D-055). 247 unit tests.
 
 ## Next (in order; anything waiting for the owner moves up as soon as it arrives)
 
@@ -135,16 +142,12 @@ help when something doesn't work.
 
 **Chunk A — help where people get stuck: done** (slices 21-22).
 
-**Chunk B — reading comfort** (next; no owner input needed)
+**Chunk B — reading comfort: done** (slices 23-24).
 
-- **Slice 23 — text size in the reader** (four steps, kept with the
-  settings), beyond the phone's own font size; checked at 200% font scale
-  (Android 14+), with TalkBack.
-- **Slice 24 — sentence by sentence.** Highlight the sentence being read
-  inside its paragraph, and skip by sentence; the most praised feature of
-  the big readers. Sentences become the unit the reader queues (one ahead,
-  as now), the memory keeps the sentence, the notification still counts
-  paragraphs.
+**Next, in order**
+
+- **What the closed test shows:** Play's pre-launch report, testers'
+  feedback, Android vitals; fixes first.
 - **Slice 25 — Quick Settings tile "Read copied text"** (Android 13+ asks
   the user to add it from within the app; Android 14+ rules for starting
   the reader from a tile).

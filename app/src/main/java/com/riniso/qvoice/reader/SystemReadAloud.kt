@@ -8,12 +8,14 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.text.format.DateFormat
+import com.riniso.qvoice.service.QVoiceTtsService
 import java.util.Date
 import java.util.Locale
 
@@ -43,7 +45,7 @@ class TtsSpeaker(private val context: Context) : Speaker {
 
     override var listener: Speaker.Listener? = null
 
-    private data class Request(val text: String, val id: String, val flush: Boolean, val rate: Float, val locale: Locale)
+    private data class Request(val text: String, val id: String, val flush: Boolean, val rate: Float, val locale: Locale, val ahead: Boolean)
 
     private val main = Handler(Looper.getMainLooper())
     private var tts: TextToSpeech? = null
@@ -51,8 +53,8 @@ class TtsSpeaker(private val context: Context) : Speaker {
     private val pending = ArrayList<Request>()
     private var locale: Locale? = null
 
-    override fun speak(text: String, utteranceId: String, flush: Boolean, rate: Float, locale: Locale): Boolean {
-        val request = Request(text, utteranceId, flush, rate, locale)
+    override fun speak(text: String, utteranceId: String, flush: Boolean, rate: Float, locale: Locale, ahead: Boolean): Boolean {
+        val request = Request(text, utteranceId, flush, rate, locale, ahead)
         if (ready) {
             if (send(request)) return true
             // The connection is gone (the engine was killed, say): drop it, so
@@ -146,7 +148,8 @@ class TtsSpeaker(private val context: Context) : Speaker {
         }
         engine.setSpeechRate(request.rate)
         val mode = if (request.flush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
-        return engine.speak(request.text, mode, null, request.id) == TextToSpeech.SUCCESS
+        val params = if (request.ahead) Bundle().apply { putBoolean(QVoiceTtsService.PARAM_QUEUED_AHEAD, true) } else null
+        return engine.speak(request.text, mode, params, request.id) == TextToSpeech.SUCCESS
     }
 }
 

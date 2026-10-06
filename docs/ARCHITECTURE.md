@@ -688,6 +688,33 @@ paragraph would be worse than none. The notification ignores it
 Try it uses the same cue from its own state (speaking, no first audio
 yet).
 
+**D-055 The reader reads sentence by sentence.** A sentence is the unit
+`ReadAloud` queues (one ahead, as paragraphs were): it knows which sentence
+plays, marks it inside its paragraph, skips back and ahead by one, restarts
+it (not the paragraph) for a new speed or voice, and resumes exactly there.
+Sentences are TextChunker's, found inside each prepared paragraph
+(`ReaderText.sentenceRanges`), so the reader splits where the engine would.
+Paragraphs stay the unit of display, of the language (picked per paragraph,
+so a paragraph never changes voice mid-way), of the notification's place
+("Paragraph 3 of 12") and of the sleep timer, which still stops at a
+paragraph's end: in its last two minutes nothing is queued across a
+paragraph's end, but sentences inside one still are. Engine side, the
+reader marks a sentence queued while another plays
+(`QVoiceTtsService.PARAM_QUEUED_AHEAD`); for it the engine skips TextChunker's
+opening cut (`SpeechModel.generate(opening = false)`), which exists to make a
+first sound come sooner and would otherwise put a pause at the first comma
+of every long sentence. A sentence queued only after the previous one ended
+(TalkBack's turns) keeps the cut: someone is waiting for it. The memory
+(D-050) became two parts, the text with an id (written once per text) and
+the place "id paragraph sentence" (a few bytes per sentence), so following
+the voice doesn't rewrite the whole text every few seconds; a place whose
+id doesn't match its text is ignored, and version-1 files are rewritten in
+two parts when first read. Considered instead: paragraphs as utterances
+with sentence progress from the engine's range callbacks (`rangeStart`).
+That would only mark chunks (TextChunker packs short sentences together),
+skipping by sentence would still mean restarting mid-paragraph, and it
+would need markers through ReadAhead's queue on the engine's hot path.
+
 ## What was taken from each reference app, and what was left behind
 
 | App | Taken | Left behind (and why) |

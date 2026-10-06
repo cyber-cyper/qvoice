@@ -1,7 +1,38 @@
 # Changelog
 
 Version numbers: since 1.0.0 the versionCode stays 1 until the owner says to
-raise it; debug builds show the slice after the version ("1.0.0-slice20").
+raise it; debug builds show the slice after the version ("1.0.0-slice22").
+
+## 1.0.0 — slice 22: "Preparing the voice…" — 2026-10-06 (versionCode 1)
+
+- **When the voice takes a moment**, it now shows. In the reader, a ring
+  turns around the play button and "Preparing the voice…" replaces the
+  position until the first sound: after Play, a jump, a speed or voice
+  change, and between paragraphs on a slow phone. In Try it, the same line
+  appears under Speak. Waits shorter than 0.4 s (the usual gap between
+  paragraphs computed ahead) show nothing, so nothing flickers. TalkBack
+  hears it on the play button. (Android's core app quality guidelines ask
+  for audio within a second of Play, or a visible sign that it's coming;
+  a large voice on a mid-range phone can take several seconds.)
+- Tests: 233 (was 231), 4 new guards proven by mutation.
+
+## 1.0.0 — slice 21: Help, and a battery warning — 2026-10-06 (versionCode 1)
+
+- **Help**, from Home's top bar (?), from the setup card ("Need help?")
+  and from About: answers to what people ask most, one open at a time,
+  each with the button that does what it says. Making QVoice the phone's
+  voice (with the menu path on Pixel and Samsung phones), having any text
+  read aloud, an app that still uses another voice, reading that stops
+  with the screen off, the best voice for TalkBack, a language QVoice
+  doesn't read, privacy, the clipboard notice, freeing storage; Send
+  feedback at the end. Works offline; TalkBack can jump from question to
+  question.
+- **A battery warning on Home**, only when Android restricts QVoice in the
+  background ("Restricted" battery setting, or the restricted standby
+  bucket Android puts apps in), the usual reason reading stops with the
+  screen off and apps that use QVoice go quiet; it opens QVoice's app
+  settings and disappears once lifted.
+- Tests: 231 (was 229), 2 new guards proven by mutation.
 
 ## 1.0.0 — slice 20: test builds next to the Play version — 2026-10-06 (versionCode 1)
 

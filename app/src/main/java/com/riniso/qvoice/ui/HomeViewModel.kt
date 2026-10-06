@@ -95,6 +95,8 @@ data class HomeUiState(
     val timing: Timing? = null,
     val errorCode: Int? = null,
     val threads: ThreadsUi = ThreadsUi(choice = 0, auto = 0, options = listOf(0)),
+    /** Android holds QVoice under battery restrictions (BatteryCheck): Home says so. */
+    val batteryRestricted: Boolean = false,
 )
 
 /**
@@ -134,6 +136,8 @@ class HomeViewModel(app: Application) : AndroidViewModel(app), TtsClient.Events 
     fun onResume() {
         refreshDefaultEngine()
         refreshVoices()
+        // On every return: the user may just have changed it in Settings.
+        _state.update { it.copy(batteryRestricted = BatteryCheck.isRestricted(getApplication())) }
     }
 
     fun onTextChange(text: String) = _state.update { it.copy(text = text) }

@@ -1,9 +1,6 @@
 package com.riniso.qvoice.ui
 
-import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +25,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -79,7 +78,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onOpenAbout: () -> Unit, onOpenVoices: () -> Unit, vm: HomeViewModel = viewModel()) {
+fun HomeScreen(onOpenAbout: () -> Unit, onOpenVoices: () -> Unit, onOpenHelp: () -> Unit, vm: HomeViewModel = viewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     val reading by vm.reading.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -102,6 +101,9 @@ fun HomeScreen(onOpenAbout: () -> Unit, onOpenVoices: () -> Unit, vm: HomeViewMo
                 },
                 actions = {
                     TextButton(onClick = onOpenVoices) { Text(stringResource(R.string.library_title)) }
+                    IconButton(onClick = onOpenHelp) {
+                        Icon(painterResource(R.drawable.ic_help), contentDescription = stringResource(R.string.help_title))
+                    }
                     IconButton(onClick = onOpenAbout) {
                         Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.action_about))
                     }
@@ -118,7 +120,8 @@ fun HomeScreen(onOpenAbout: () -> Unit, onOpenVoices: () -> Unit, vm: HomeViewMo
                 contentPadding = readablePadding(padding, top = 8.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                item { SetupCard(state, onOpenSettings = { openTtsSettings(context) }) }
+                item { SetupCard(state, onOpenSettings = { openTtsSettings(context) }, onOpenHelp = onOpenHelp) }
+                if (state.batteryRestricted) item { BatteryCard(onOpenSettings = { openAppSettings(context) }) }
                 item {
                     TryItCard(
                         state = state,
@@ -190,14 +193,48 @@ fun HomeScreen(onOpenAbout: () -> Unit, onOpenVoices: () -> Unit, vm: HomeViewMo
  * through); afterwards a small confirmation.
  */
 @Composable
-private fun SetupCard(state: HomeUiState, onOpenSettings: () -> Unit) {
+private fun SetupCard(state: HomeUiState, onOpenSettings: () -> Unit, onOpenHelp: () -> Unit) {
     when {
         state.engineState == EngineState.CONNECTING -> NoticeCard { Text(stringResource(R.string.status_connecting)) }
         state.engineState == EngineState.FAILED -> NoticeCard {
             Text(stringResource(R.string.status_engine_failed), color = MaterialTheme.colorScheme.error)
         }
         state.isDefaultEngine == true -> DefaultEngineCard(onOpenSettings)
-        else -> MakeDefaultCard(onOpenSettings)
+        else -> MakeDefaultCard(onOpenSettings, onOpenHelp)
+    }
+}
+
+/**
+ * Only while Android holds QVoice under battery restrictions (BatteryCheck):
+ * what that breaks, and the way to its settings. Gone on the next return to
+ * Home once lifted.
+ */
+@Composable
+private fun BatteryCard(onOpenSettings: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+    ) {
+        Row(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
+            Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    stringResource(R.string.battery_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier.semantics { heading() },
+                )
+                Text(
+                    stringResource(R.string.battery_body),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+        }
+        TextButton(onClick = onOpenSettings, modifier = Modifier.padding(start = 44.dp, bottom = 4.dp)) {
+            Text(stringResource(R.string.action_open_app_settings))
+        }
     }
 }
 
@@ -213,7 +250,7 @@ private fun NoticeCard(content: @Composable () -> Unit) {
  * its text colours are fixed to match (all at least 4.5:1 on the gradient).
  */
 @Composable
-private fun MakeDefaultCard(onOpenSettings: () -> Unit) {
+private fun MakeDefaultCard(onOpenSettings: () -> Unit, onOpenHelp: () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -240,6 +277,16 @@ private fun MakeDefaultCard(onOpenSettings: () -> Unit) {
             Text(stringResource(R.string.action_open_tts_settings))
         }
         Text(stringResource(R.string.setup_note), style = MaterialTheme.typography.bodySmall, color = Color(0xFFB9B2FF))
+        // On a line of its own: next to the long button it wouldn't fit a
+        // 360 dp phone. The settings differ by phone; Help names the path on
+        // Pixel and Samsung phones.
+        TextButton(
+            onClick = onOpenHelp,
+            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFC9F1FC)),
+            contentPadding = PaddingValues(horizontal = 0.dp),
+        ) {
+            Text(stringResource(R.string.action_need_help))
+        }
     }
 }
 
@@ -382,6 +429,19 @@ private fun TryItCard(
                 }
                 OutlinedButton(onClick = onStop, enabled = state.speaking) {
                     Text(stringResource(R.string.action_stop))
+                }
+            }
+            // Speak pressed, no audio yet (a large voice loading, a slow phone):
+            // say so where the timing appears once it speaks.
+            if (rememberLastingFlag(state.speaking && state.timing == null)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        stringResource(R.string.reader_preparing),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
             state.timing?.let { t ->
@@ -539,18 +599,3 @@ private fun formatRate(rate: Float): String =
  * action below is what the Settings app registers on AOSP, Pixel, Samsung and
  * most OEM builds. Falls back to Accessibility, then to Settings itself.
  */
-private fun openTtsSettings(context: Context) {
-    val candidates = listOf(
-        Intent("com.android.settings.TTS_SETTINGS"),
-        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
-        Intent(Settings.ACTION_SETTINGS),
-    )
-    for (intent in candidates) {
-        try {
-            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            return
-        } catch (e: ActivityNotFoundException) {
-            // try the next one
-        }
-    }
-}

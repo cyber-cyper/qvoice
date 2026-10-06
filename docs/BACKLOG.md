@@ -1,6 +1,6 @@
 # QVoice backlog
 
-Each slice is small, self-contained and shippable. Status as of slice 20
+Each slice is small, self-contained and shippable. Status as of slice 22
 (version 1.0.0, versionCode 1).
 
 ## Done
@@ -103,6 +103,13 @@ Each slice is small, self-contained and shippable. Status as of slice 20
   their copy of the shortcuts and catches deprecated `Locale` constructors
   (the owner's build warned about three in the tests). The release guide
   goes through Play's internal testing first.
+- **Slice 21 — Help, and a battery warning** (1.0.0). An offline Help
+  screen with the questions people ask most and buttons that act on them;
+  a Home card only while Android restricts QVoice in the background
+  (D-053). 231 unit tests.
+- **Slice 22 — "Preparing the voice…"** (1.0.0). A cue in the reader and
+  Try it while the voice prepares, shown only for waits over 0.4 s
+  (D-054). 233 unit tests.
 
 ## Next (in order; anything waiting for the owner moves up as soon as it arrives)
 
@@ -121,36 +128,19 @@ good voices, no ads or subscriptions (QVoice's strongest selling points:
 lead the listing with them), then sentence highlighting, text size, and
 help when something doesn't work.
 
-**Chunk A — help where people get stuck** (next; no owner input needed)
+**Chunk A — help where people get stuck: done** (slices 21-22).
 
-- **Slice 20 — Help and FAQ, offline, plus a battery check.** A Help
-  screen (from About and from the setup card) answering what users of
-  third-party engines ask most: making QVoice the preferred engine (Pixel
-  and Samsung menu paths), reading that stops with the screen off (battery
-  restrictions: set QVoice, and the reading app, to Unrestricted), an app
-  that still uses Google's voice (apps that choose their own engine), the
-  best voice for TalkBack, whether text leaves the phone, freeing storage,
-  the clipboard notice. Send feedback at its end. On Home, a card only
-  when Android has QVoice under battery restriction
-  (`ActivityManager.isBackgroundRestricted`), with the button to its
-  settings; QVoice can't ask for an exemption itself (a Play policy
-  restriction), and doesn't need one when unrestricted.
-- **Slice 21 — "Preparing the voice…".** Core app quality asks for audio
-  within a second of Play or a visible cue; a large voice on a mid-range
-  phone can take several seconds for the first sentence. The play button
-  shows progress until the first audio, in the reader and in Try it.
+**Chunk B — reading comfort** (next; no owner input needed)
 
-**Chunk B — reading comfort**
-
-- **Slice 22 — text size in the reader** (four steps, kept with the
+- **Slice 23 — text size in the reader** (four steps, kept with the
   settings), beyond the phone's own font size; checked at 200% font scale
   (Android 14+), with TalkBack.
-- **Slice 23 — sentence by sentence.** Highlight the sentence being read
+- **Slice 24 — sentence by sentence.** Highlight the sentence being read
   inside its paragraph, and skip by sentence; the most praised feature of
   the big readers. Sentences become the unit the reader queues (one ahead,
   as now), the memory keeps the sentence, the notification still counts
   paragraphs.
-- **Slice 24 — Quick Settings tile "Read copied text"** (Android 13+ asks
+- **Slice 25 — Quick Settings tile "Read copied text"** (Android 13+ asks
   the user to add it from within the app; Android 14+ rules for starting
   the reader from a tile).
 

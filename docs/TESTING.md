@@ -9,7 +9,7 @@ open the project, then the green ▶ Run button installs it on the phone).
 1. Unpack over the project (the download folder and the zip's name change):
 
    ```powershell
-   Expand-Archive -Force "$env:USERPROFILE\Downloads\QVoice-slice20-src.zip" -DestinationPath "C:\Users\Public\QVoice-slice02-fix1-src"
+   Expand-Archive -Force "$env:USERPROFILE\Downloads\QVoice-slice22-src.zip" -DestinationPath "C:\Users\Public\QVoice-slice02-fix1-src"
    ```
 
 2. Unit tests, then build and install on the phone:
@@ -47,7 +47,7 @@ open the project, then the green ▶ Run button installs it on the phone).
 
 | Check | Command | Where it runs |
 |---|---|---|
-| Unit tests (229) | `gradle test` | your machine; also run in the authoring sandbox |
+| Unit tests (233) | `gradle test` | your machine; also run in the authoring sandbox |
 | Static project checks | `python tools/check_project.py` | anywhere with Python 3 |
 | Kotlin compile of all non-Compose code (incl. both view models and the reading service with its media session and notification), warnings as errors | (sandbox: kotlinc 2.2.10 against android-35, sherpa-onnx 1.13.8, Commons Compress 1.27.1) | authoring sandbox |
 | Compose screens compiled against stubs of the real Compose 1.9 / Material 3 1.3.2 API (made from the published API signature files), warnings as errors, then the Compose compiler plugin's checks | `bash tools/sandbox/verify.sh` step 4; stubs in `tools/sandbox/compose-stubs/` | authoring sandbox |
@@ -135,6 +135,9 @@ named test failed there.
 | A clip marked sensitive isn't even fetched unless asked for | `aSensitiveClipIsRefusedWithoutBeingRead` |
 | No deprecated `Locale` constructors (the owner's JDK 21 build warns; the sandbox can't see it) | checker rule 12 (caught the three real ones) |
 | Debug shortcuts match the main ones except the package (2 planted drifts) | checker rule 13 |
+| Battery warning: the restricted bucket or the user's restriction, nothing else (2 mutations) | `everyOrdinaryBucketIsFine`, `theRestrictedBucketOrTheUsersRestrictionWarns` |
+| "Preparing": on after Play, a jump and between paragraphs; off at the first audio (2 mutations) | `theReaderSaysWhenTheVoiceIsStillPreparing` |
+| "Preparing": off on pause and on an engine error (2 mutations) | `nothingIsPreparingOnceReadingStops` |
 
 The static checker was also run against copies with planted errors (seven
 in slice 1, a bogus member import in slice 2) and reported each.
@@ -577,12 +580,45 @@ $adb = "C:\Users\Public\sdk\platform-tools\adb.exe"
 Then install as usual (`gradle test installDebug`).
 
 1. The launcher shows **QVoice debug**; About shows version
-   1.0.0-slice20.
+   1.0.0-slice22 (or later).
 2. Android's text-to-speech settings list **QVoice Text-to-Speech
    (debug)**; choose it as the preferred engine (or keep Google's until
    the Play version is installed).
 3. Long-press QVoice debug's icon: Read aloud, Read copied text, Voices;
    each opens QVoice debug's screen (not another app).
+
+## On-device test — slice 21 (Help, battery warning)
+
+Three minutes.
+
+1. Home: a **?** next to ⓘ in the top bar. Tap it: Help, with nine
+   questions. Tap one: its answer opens (the one before closes); tap again
+   to close. "How do I make apps speak with QVoice?" → **Open
+   text-to-speech settings** opens them; "Reading stops when the screen
+   turns off" → **Open QVoice's app settings** opens App info.
+2. Back from Help returns to Home. About → **Help** opens it too, and back
+   returns to About.
+3. Battery warning: Settings → Apps → QVoice debug → Battery →
+   **Restricted**, then back to QVoice: a "Battery saving can stop QVoice"
+   card under the setup card; its button opens the same App info. Set it
+   back to **Optimized** (or Unrestricted) and return: the card is gone.
+4. Without QVoice as the preferred engine, the setup card shows **Need
+   help?** under its button; it opens Help.
+
+## On-device test — slice 22 ("Preparing the voice…")
+
+Two minutes; easiest with a large voice (Kokoro or Supertonic) if one is
+installed, otherwise right after opening QVoice (the first sentence loads
+the voice).
+
+1. Reader: paste a text and play. Until the first word: a ring around the
+   play button and "Preparing the voice…" at the right of the controls;
+   both go when it speaks. Between paragraphs with the built-in voice:
+   nothing flickers.
+2. Change the speed while reading: the ring shows briefly if the voice
+   needs a moment.
+3. Home → Try it with the same large voice: "Preparing the voice…" under
+   Speak until it speaks, then the timing line as before.
 
 ## Not testable yet
 

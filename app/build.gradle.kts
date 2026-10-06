@@ -92,7 +92,7 @@ android {
     buildTypes {
         debug {
             // Which development slice a test build is; release builds say "1.0.0".
-            versionNameSuffix = "-slice20"
+            versionNameSuffix = "-slice22"
             // A separate app (com.riniso.qvoice.debug, "QVoice debug"), so test
             // builds install next to the version from Google Play instead of
             // clashing with it: different signing keys can't update each other,

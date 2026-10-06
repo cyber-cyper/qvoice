@@ -13,14 +13,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
 /**
- * The only activity with UI. Three screens don't justify Navigation Compose,
- * so a saveable value switches between them and the system back gesture
- * returns to Home. [EXTRA_SCREEN] opens a given screen (Android's TTS
+ * The main activity (the reader has its own). Four screens don't justify
+ * Navigation Compose, so a saveable value switches between them and the
+ * system back gesture returns to Home, or from Help to where Help was opened
+ * (Home or About). [EXTRA_SCREEN] opens a given screen (Android's TTS
  * settings "Install voice data" opens the voice library).
  */
 class MainActivity : ComponentActivity() {
 
-    enum class Screen { HOME, VOICES, ABOUT }
+    enum class Screen { HOME, VOICES, ABOUT, HELP }
 
     /** A screen asked for by the launching intent, consumed once shown. */
     private val requested = mutableStateOf<Screen?>(null)
@@ -36,6 +37,12 @@ class MainActivity : ComponentActivity() {
                 // voice library from Android's TTS settings doesn't draw (and
                 // set up) Home first for a frame.
                 var screen by rememberSaveable { mutableStateOf(requested.value ?: Screen.HOME) }
+                // Where Help goes back to: it opens from Home and from About.
+                var helpReturn by rememberSaveable { mutableStateOf(Screen.HOME) }
+                val openHelp = { from: Screen ->
+                    helpReturn = from
+                    screen = Screen.HELP
+                }
                 val asked by requested
                 LaunchedEffect(asked) {
                     asked?.let {
@@ -43,14 +50,18 @@ class MainActivity : ComponentActivity() {
                         requested.value = null
                     }
                 }
-                BackHandler(enabled = screen != Screen.HOME) { screen = Screen.HOME }
+                BackHandler(enabled = screen != Screen.HOME) {
+                    screen = if (screen == Screen.HELP) helpReturn else Screen.HOME
+                }
                 when (screen) {
                     Screen.HOME -> HomeScreen(
                         onOpenAbout = { screen = Screen.ABOUT },
                         onOpenVoices = { screen = Screen.VOICES },
+                        onOpenHelp = { openHelp(Screen.HOME) },
                     )
                     Screen.VOICES -> VoicesScreen(onBack = { screen = Screen.HOME })
-                    Screen.ABOUT -> AboutScreen(onBack = { screen = Screen.HOME })
+                    Screen.ABOUT -> AboutScreen(onBack = { screen = Screen.HOME }, onOpenHelp = { openHelp(Screen.ABOUT) })
+                    Screen.HELP -> HelpScreen(onBack = { screen = helpReturn }, onOpenVoices = { screen = Screen.VOICES })
                 }
             }
         }

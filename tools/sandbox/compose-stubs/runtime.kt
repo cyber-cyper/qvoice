@@ -34,6 +34,11 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
 interface SnapshotMutationPolicy<T>
 fun <T> structuralEqualityPolicy(): SnapshotMutationPolicy<T> = TODO()
 fun <T> mutableStateOf(value: T, policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()): MutableState<T> = TODO()
+@Stable interface IntState : State<Int> { override val value: Int; val intValue: Int }
+@Stable interface MutableIntState : IntState, MutableState<Int> { override var value: Int; override var intValue: Int }
+fun mutableIntStateOf(value: Int): MutableIntState = TODO()
+inline operator fun IntState.getValue(thisObj: Any?, property: KProperty<*>): Int = intValue
+inline operator fun MutableIntState.setValue(thisObj: Any?, property: KProperty<*>, value: Int) { intValue = value }
 
 @Composable inline fun <T> remember(crossinline calculation: @DisallowComposableCalls () -> T): T = calculation()
 @Composable inline fun <T> remember(key1: Any?, crossinline calculation: @DisallowComposableCalls () -> T): T = calculation()

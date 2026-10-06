@@ -655,6 +655,35 @@ package out, so debug builds carry their own copy of `shortcuts.xml`;
 `tools/check_project.py` (rule 13) fails when the copies differ in anything
 but the package. Sister apps bind com.riniso.qvoice: the Play version.
 
+**D-053 Help inside the app; a battery warning only when it applies.**
+Help is a screen of the app (`HelpScreen`), not a web page: it works
+offline like everything else, can't go stale against the installed
+version, and its answers carry buttons that do what they say (the
+text-to-speech settings, QVoice's App info, the voice library, the privacy
+policy). The questions are the ones users of third-party engines and
+readers ask most (researched October 2026); one answer is open at a time
+so the list stays scannable, and each question is a TalkBack heading.
+The battery warning on Home is shown only when Android actually restricts
+QVoice: `ActivityManager.isBackgroundRestricted` (the "Restricted" battery
+setting, which is also how some makers' "deep sleeping" works) or the
+restricted app standby bucket (Android 11+). A permanent "disable battery
+optimisation" nag would be noise for most people, and requesting the
+exemption directly (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) is limited by
+Play's policy to other kinds of apps; App info is the one page every
+Android version has.
+
+**D-054 "Preparing the voice" is part of the reader's state.**
+`ReadAloud.State.preparing` is true from Play (or a jump, a speed or voice
+change) until the paragraph's first audio (`onStart`), and again between
+paragraphs from one's end to the next one's start; every way of stopping
+clears it. The UI shows it only once it has lasted 400 ms
+(`rememberLastingFlag`): a paragraph computed ahead starts within
+milliseconds of the previous end, and a cue that flashed at every
+paragraph would be worse than none. The notification ignores it
+(NowPlaying leaves it out), so it causes no extra notification updates.
+Try it uses the same cue from its own state (speaking, no first audio
+yet).
+
 ## What was taken from each reference app, and what was left behind
 
 | App | Taken | Left behind (and why) |

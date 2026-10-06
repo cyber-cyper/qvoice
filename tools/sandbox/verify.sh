@@ -69,6 +69,7 @@ javac -d "$B/r" "$B/r/com/riniso/qvoice/R.java"
   app/src/main/java/com/riniso/qvoice/ui/ReadableWidth.kt \
   app/src/main/java/com/riniso/qvoice/ui/Links.kt \
   app/src/main/java/com/riniso/qvoice/ui/ClipboardText.kt \
+  app/src/main/java/com/riniso/qvoice/ui/BatteryCheck.kt \
   $(find tools/sandbox/stubs -name "*.kt")
 "$KC" -jvm-target 17 -no-reflect -Werror -Xfriend-paths="$B/main" \
   -classpath "$T/orgjson/org-json.jar:$B/main:$T/junitstub/junit-stub.jar:$CP_MAIN" \

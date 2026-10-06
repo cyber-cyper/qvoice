@@ -32,6 +32,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -279,28 +280,41 @@ private fun Notice(
 @Composable
 private fun ReaderControls(state: ReadAloud.State, reader: ReadAloud) {
     val playing = state.status == ReadAloud.Status.PLAYING
+    // Shown only when the wait lasts: between paragraphs computed ahead it
+    // is a few milliseconds and mustn't flicker.
+    val preparingShown = rememberLastingFlag(state.preparing)
+    val preparingLabel = stringResource(R.string.reader_preparing)
     BottomAppBar {
         SpeedButton(state.rate, onPick = reader::setRate)
         Spacer(Modifier.weight(1f))
         IconButton(onClick = { reader.previous() }) {
             Icon(painterResource(R.drawable.ic_skip_previous), contentDescription = stringResource(R.string.reader_previous))
         }
-        FilledIconButton(onClick = { reader.toggle() }, modifier = Modifier.size(56.dp)) {
-            if (playing) {
-                Icon(painterResource(R.drawable.ic_pause), contentDescription = stringResource(R.string.reader_pause))
-            } else {
-                Icon(Icons.Filled.PlayArrow, contentDescription = stringResource(R.string.reader_play))
+        Box(contentAlignment = Alignment.Center) {
+            FilledIconButton(
+                onClick = { reader.toggle() },
+                modifier = Modifier
+                    .size(56.dp)
+                    .semantics { if (preparingShown) stateDescription = preparingLabel },
+            ) {
+                if (playing) {
+                    Icon(painterResource(R.drawable.ic_pause), contentDescription = stringResource(R.string.reader_pause))
+                } else {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = stringResource(R.string.reader_play))
+                }
             }
+            // A ring around the button while the voice prepares the paragraph.
+            if (preparingShown) CircularProgressIndicator(modifier = Modifier.size(60.dp), strokeWidth = 3.dp)
         }
         IconButton(onClick = { reader.next() }, enabled = state.index < state.paragraphs.lastIndex) {
             Icon(painterResource(R.drawable.ic_skip_next), contentDescription = stringResource(R.string.reader_next))
         }
         Spacer(Modifier.weight(1f))
         Text(
-            if (state.status == ReadAloud.Status.FINISHED) {
-                stringResource(R.string.reader_finished)
-            } else {
-                stringResource(R.string.reader_position, state.index + 1, state.paragraphs.size)
+            when {
+                state.status == ReadAloud.Status.FINISHED -> stringResource(R.string.reader_finished)
+                preparingShown -> preparingLabel
+                else -> stringResource(R.string.reader_position, state.index + 1, state.paragraphs.size)
             },
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.padding(end = 12.dp),
@@ -575,6 +589,7 @@ private fun PasteBox(
 
 /** Rows before the first paragraph in the list (the notice). */
 private const val NOTICE_ROWS = 1
+
 
 /** 1f -> "1", 1.25f -> "1.25", 0.75f -> "0.75". */
 private fun formatSpeed(rate: Float): String =

@@ -38,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -76,7 +75,7 @@ val COMPONENTS = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutScreen(onBack: () -> Unit) {
+fun AboutScreen(onBack: () -> Unit, onOpenHelp: () -> Unit) {
     val context = LocalContext.current
     var shownLicence by remember { mutableStateOf<Component?>(null) }
 
@@ -102,13 +101,19 @@ fun AboutScreen(onBack: () -> Unit) {
                 item {
                     Column {
                         LinkItem(
-                            icon = Icons.Outlined.Email,
+                            icon = { Icon(painterResource(R.drawable.ic_help), contentDescription = null) },
+                            title = stringResource(R.string.help_title),
+                            detail = stringResource(R.string.about_help_body),
+                            onClick = onOpenHelp,
+                        )
+                        LinkItem(
+                            icon = { Icon(Icons.Outlined.Email, contentDescription = null) },
                             title = stringResource(R.string.action_send_feedback),
                             detail = stringResource(R.string.about_feedback_body, Links.SUPPORT_EMAIL),
                             onClick = { sendFeedback(context) },
                         )
                         LinkItem(
-                            icon = Icons.Outlined.Star,
+                            icon = { Icon(Icons.Outlined.Star, contentDescription = null) },
                             title = stringResource(R.string.action_rate),
                             detail = stringResource(R.string.about_rate_body),
                             onClick = { openPlayListing(context) },
@@ -214,13 +219,13 @@ private fun readAsset(context: Context, path: String): String =
     runCatching { context.assets.open(path).bufferedReader().use { it.readText() } }
         .getOrDefault("Licence text missing: $path")
 
-/** One tappable row: an icon, what it does, and where it goes. The whole row is the target. */
+/** One tappable row: an icon (decorative), what it does, and where it goes. The whole row is the target. */
 @Composable
-private fun LinkItem(icon: ImageVector, title: String, detail: String, onClick: () -> Unit) {
+private fun LinkItem(icon: @Composable () -> Unit, title: String, detail: String, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = { Text(detail) },
-        leadingContent = { Icon(icon, contentDescription = null) },
+        leadingContent = icon,
         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable(role = Role.Button, onClick = onClick),
     )
 }

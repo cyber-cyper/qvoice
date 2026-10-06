@@ -311,6 +311,49 @@ class ReaderTest {
         assertEquals(0, reader.state.value.index)
     }
 
+    // ---- "Preparing the voice" ----
+
+    @Test
+    fun theReaderSaysWhenTheVoiceIsStillPreparing() {
+        reader.load(text, play = true)
+        assertTrue(reader.state.value.preparing) // Play pressed, no audio yet
+        started("One.")
+        assertFalse(reader.state.value.preparing)
+        // The paragraph ends; the next one (queued ahead) hasn't started yet.
+        reader.onDone(lastIdOf("One."))
+        assertTrue(reader.state.value.preparing)
+        started("Two.")
+        assertFalse(reader.state.value.preparing)
+        // A jump restarts the wait.
+        reader.jumpTo(3)
+        assertTrue(reader.state.value.preparing)
+    }
+
+    @Test
+    fun nothingIsPreparingOnceReadingStops() {
+        reader.load(text, play = true)
+        reader.pause()
+        assertFalse(reader.state.value.preparing)
+        reader.play()
+        reader.onError(lastIdOf("One."), -1)
+        assertFalse(reader.state.value.preparing)
+        // The last paragraph ends: finished, not preparing.
+        reader.jumpTo(3)
+        reader.play()
+        started("Four.")
+        reader.onDone(lastIdOf("Four."))
+        assertEquals(ReadAloud.Status.FINISHED, reader.state.value.status)
+        assertFalse(reader.state.value.preparing)
+        // A next paragraph no voice can read stops reading with its reason, not "preparing".
+        unreadable = "Two."
+        reader.jumpTo(0)
+        reader.play()
+        started("One.")
+        reader.onDone(lastIdOf("One."))
+        assertEquals(ReadAloud.Problem.NO_VOICE, reader.state.value.problem)
+        assertFalse(reader.state.value.preparing)
+    }
+
     // ---- A remembered text (ReaderMemory) ----
 
     @Test

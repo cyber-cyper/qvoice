@@ -154,7 +154,7 @@ app/src/main/java/com/riniso/qvoice/
   reader/                     read aloud: paragraphs, per-paragraph language, the reading state machine, audio focus, the background media service
   service/                    the TextToSpeechService and its helper activities
   settings/                   user choices read on the synthesis hot path
-  ui/                         Compose UI (home, voice library, about, the reader)
+  ui/                         Compose UI (home, voice library, about, help, the reader)
 app/src/main/assets/catalog.json   the voice catalogue (generated, see below)
 app/src/main/assets/bundled/  the built-in voice (plain files, read from the APK) and espeak-ng data (zip)
 app/src/debug/res/            debug builds only: "QVoice debug" names and its launcher shortcuts (com.riniso.qvoice.debug)

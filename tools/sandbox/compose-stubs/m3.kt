@@ -119,6 +119,8 @@ class ButtonElevation
 object ButtonDefaults {
     @Composable fun buttonColors(): ButtonColors = TODO()
     @Composable fun buttonColors(containerColor: Color = Color.Unspecified, contentColor: Color = Color.Unspecified, disabledContainerColor: Color = Color.Unspecified, disabledContentColor: Color = Color.Unspecified): ButtonColors = TODO()
+    @Composable fun textButtonColors(): ButtonColors = TODO()
+    @Composable fun textButtonColors(containerColor: Color = Color.Unspecified, contentColor: Color = Color.Unspecified, disabledContainerColor: Color = Color.Unspecified, disabledContentColor: Color = Color.Unspecified): ButtonColors = TODO()
 }
 @Composable fun Button(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, shape: Shape = TODO(), colors: ButtonColors = TODO(), elevation: ButtonElevation? = TODO(), border: BorderStroke? = null, contentPadding: PaddingValues = TODO(), interactionSource: MutableInteractionSource? = null, content: @Composable RowScope.() -> Unit) {}
 @Composable fun OutlinedButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, shape: Shape = TODO(), colors: ButtonColors = TODO(), elevation: ButtonElevation? = null, border: BorderStroke? = TODO(), contentPadding: PaddingValues = TODO(), interactionSource: MutableInteractionSource? = null, content: @Composable RowScope.() -> Unit) {}
@@ -163,6 +165,7 @@ class TextFieldColors
 // ---- progress (visible overloads in 1.3.2; the others are DeprecationLevel.HIDDEN) ----
 @Composable fun LinearProgressIndicator(progress: () -> Float, modifier: Modifier = Modifier, color: Color = TODO(), trackColor: Color = TODO(), strokeCap: StrokeCap = TODO(), gapSize: Dp = TODO(), drawStopIndicator: DrawScope.() -> Unit = {}) {}
 @Composable fun LinearProgressIndicator(modifier: Modifier = Modifier, color: Color = TODO(), trackColor: Color = TODO(), strokeCap: StrokeCap = TODO(), gapSize: Dp = TODO()) {}
+@Composable fun CircularProgressIndicator(modifier: Modifier = Modifier, color: Color = TODO(), strokeWidth: Dp = TODO(), trackColor: Color = TODO(), strokeCap: StrokeCap = TODO()) {}
 @Deprecated("Use the overload that takes `progress` as a lambda")
 @Composable fun LinearProgressIndicator(progress: Float, modifier: Modifier = Modifier, color: Color = TODO(), trackColor: Color = TODO(), strokeCap: StrokeCap = TODO()) {}
 

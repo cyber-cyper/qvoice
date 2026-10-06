@@ -119,6 +119,14 @@ class ReadAloud(
         val problem: Problem? = null,
         /** When the sleep timer stops reading, on [clock]'s time line; null: no timer. */
         val sleepAt: Long? = null,
+        /**
+         * Reading, but the voice hasn't started the paragraph yet: after Play
+         * or a jump, and between paragraphs while the next one is computed.
+         * The reader shows it (after a moment, so a gap of a few milliseconds
+         * doesn't flicker): core app quality asks for audio within a second
+         * of Play or a visible sign that it's coming.
+         */
+        val preparing: Boolean = false,
     )
 
     private val _state = MutableStateFlow(State(rate = initialRate))
@@ -184,7 +192,7 @@ class ReadAloud(
     fun pause() {
         if (_state.value.status != Status.PLAYING) return
         halt()
-        _state.update { it.copy(status = Status.PAUSED) }
+        _state.update { it.copy(status = Status.PAUSED, preparing = false) }
     }
 
     fun toggle() = if (_state.value.status == Status.PLAYING) pause() else play()
@@ -253,7 +261,7 @@ class ReadAloud(
                 Status.EMPTY, Status.READY -> it
                 Status.FINISHED -> it.copy(index = 0, status = Status.READY)
                 Status.PLAYING, Status.PAUSED -> it.copy(status = Status.READY)
-            }.copy(sleepAt = null)
+            }.copy(sleepAt = null, preparing = false)
         }
     }
 
@@ -261,7 +269,7 @@ class ReadAloud(
 
     override fun onStart(utteranceId: String) {
         val index = current(utteranceId) ?: return
-        _state.update { it.copy(index = index) }
+        _state.update { it.copy(index = index, preparing = false) }
         // One ahead, unless a screen reader needs its turns (see screenReaderOn)
         // or the sleep timer is about to stop reading (see sleepsSoon); if it
         // can't be queued, onDone says why.
@@ -272,27 +280,34 @@ class ReadAloud(
         val index = current(utteranceId) ?: return
         if (index == _state.value.paragraphs.lastIndex) {
             halt()
-            _state.update { it.copy(index = index, status = Status.FINISHED, sleepAt = null) }
+            _state.update { it.copy(index = index, status = Status.FINISHED, sleepAt = null, preparing = false) }
             return
         }
         if (sleepDue()) {
             // The sleep timer ran out during this paragraph: stop here, between
             // paragraphs, where Play will go on.
             halt()
-            _state.update { it.copy(index = index + 1, status = Status.PAUSED, sleepAt = null) }
+            _state.update { it.copy(index = index + 1, status = Status.PAUSED, sleepAt = null, preparing = false) }
             return
         }
-        if (queuedUpTo > index) return // the next one is queued and will start
-        val problem = enqueue(index + 1, flush = false) ?: return
-        // It can't be spoken: stop there and say why.
-        halt()
-        _state.update { it.copy(index = index + 1, status = Status.PAUSED, problem = problem) }
+        // From here the next paragraph is on its way: it starts the moment its
+        // audio is ready (onStart), at once when it was computed ahead.
+        if (queuedUpTo <= index) {
+            val problem = enqueue(index + 1, flush = false)
+            if (problem != null) {
+                // It can't be spoken: stop there and say why.
+                halt()
+                _state.update { it.copy(index = index + 1, status = Status.PAUSED, problem = problem, preparing = false) }
+                return
+            }
+        }
+        _state.update { it.copy(preparing = true) }
     }
 
     override fun onError(utteranceId: String, errorCode: Int) {
         current(utteranceId) ?: return
         halt()
-        _state.update { it.copy(status = Status.PAUSED, problem = Problem.ENGINE) }
+        _state.update { it.copy(status = Status.PAUSED, problem = Problem.ENGINE, preparing = false) }
     }
 
     // ---- PlaybackGuard.Listener ----
@@ -306,7 +321,7 @@ class ReadAloud(
         // A call or an alert: silent, but still holding the audio request,
         // which is what brings the "audio is back" callback.
         silence()
-        _state.update { it.copy(status = Status.PAUSED) }
+        _state.update { it.copy(status = Status.PAUSED, preparing = false) }
         resumeOnFocusGain = true
     }
 
@@ -326,10 +341,10 @@ class ReadAloud(
         silence()
         queuedUpTo = index - 1
         resumeOnFocusGain = false
-        _state.update { it.copy(index = index, status = Status.PLAYING, problem = null) }
+        _state.update { it.copy(index = index, status = Status.PLAYING, problem = null, preparing = true) }
         val problem = enqueue(index, flush = true) ?: return
         halt()
-        _state.update { it.copy(status = Status.PAUSED, problem = problem) }
+        _state.update { it.copy(status = Status.PAUSED, problem = problem, preparing = false) }
     }
 
     /**

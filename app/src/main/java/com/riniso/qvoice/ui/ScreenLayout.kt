@@ -5,9 +5,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 /**
  * The content padding of a screen's scrolling content, inside the
@@ -32,3 +38,25 @@ internal fun BoxWithConstraintsScope.readablePadding(scaffold: PaddingValues, to
         bottom = scaffold.calculateBottomPadding() + bottom,
     )
 }
+
+/**
+ * [flag], but only once it has stayed true for [delayMs]: for "preparing the
+ * voice" cues, which must not flicker for waits of a few milliseconds (the
+ * gap before a paragraph computed ahead) yet show any wait a listener would
+ * notice. Core app quality asks for audio within a second of Play, or a cue.
+ */
+@Composable
+internal fun rememberLastingFlag(flag: Boolean, delayMs: Long = PREPARING_CUE_DELAY_MS): Boolean {
+    var shown by remember { mutableStateOf(false) }
+    LaunchedEffect(flag) {
+        shown = false
+        if (flag) {
+            delay(delayMs)
+            shown = true
+        }
+    }
+    return shown
+}
+
+/** Long enough to skip the gap before a paragraph computed ahead, short enough to show any real wait. */
+internal const val PREPARING_CUE_DELAY_MS = 400L

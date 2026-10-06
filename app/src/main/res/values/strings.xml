@@ -136,6 +136,41 @@
     <string name="action_rate">Rate QVoice</string>
     <string name="about_rate_body">Tell others what you think, on Google Play</string>
     <string name="action_privacy_policy">Read the privacy policy</string>
+    <string name="about_help_body">Answers to common questions</string>
+
+    <!-- Help (from Home's top bar, the setup card and About). Offline, like the rest of the app. -->
+    <string name="help_title">Help</string>
+    <string name="help_intro">Answers to what people ask most. Anything else: send us a note at the end.</string>
+    <string name="action_need_help">Need help?</string>
+    <string name="action_open_app_settings">Open QVoice\'s app settings</string>
+    <string name="help_show_answer">Show the answer</string>
+    <string name="help_hide_answer">Hide the answer</string>
+    <string name="help_state_open">Expanded</string>
+    <string name="help_state_closed">Collapsed</string>
+    <string name="help_q_engine">How do I make apps speak with QVoice?</string>
+    <string name="help_a_engine">Make QVoice your phone\'s preferred engine: in Android\'s text-to-speech settings, tap Preferred engine and choose QVoice Text-to-Speech. On Pixel phones they are in Settings › Accessibility › Text-to-speech output; on Samsung phones, Settings › General management › Text-to-speech. Other phones put them in similar places.</string>
+    <string name="help_q_read">How do I have any text read aloud?</string>
+    <string name="help_a_read">Select text in any app and choose Read aloud (sometimes under ⋮ in the selection menu), share text or a .txt file to QVoice, or copy text and long-press QVoice\'s icon › Read copied text. The reader goes on with the screen off, remembers where you stopped, and the notification and your headset control it.</string>
+    <string name="help_q_other_app">An app still uses another voice</string>
+    <string name="help_a_other_app">Some apps choose their engine themselves: look in that app\'s settings for a text-to-speech or voice option and choose QVoice. Close and reopen the app after changing the preferred engine. QVoice speaks only languages it has voices for.</string>
+    <string name="help_q_screen_off">Reading stops when the screen turns off</string>
+    <string name="help_a_screen_off">Battery saving is the usual cause. In QVoice\'s app settings, open Battery and choose Unrestricted (on some phones: “Allow background activity” or “Don\'t optimize”). If another app reads with QVoice, do the same for that app.</string>
+    <string name="help_q_talkback">Which voice is best with TalkBack?</string>
+    <string name="help_a_talkback">A fast one, so TalkBack answers at once: the built-in voice, or the Piper voices (LJ, Kristin, Norman, John, Cori). Kokoro and Supertonic sound more natural but can take a moment to start on mid-range phones; QVoice shows each voice\'s speed on your phone.</string>
+    <string name="help_q_language">QVoice doesn\'t read my language</string>
+    <string name="help_a_language">QVoice speaks the languages of the voices on your phone. In Voices, Supertonic adds 31 languages and Kokoro 8, Hindi among them. For a language QVoice has no voice for yet, keep another engine as the phone\'s preferred engine.</string>
+    <string name="help_q_private">Does my text leave my phone?</string>
+    <string name="help_a_private">No. Everything QVoice says is made on your phone, and QVoice collects no data. The reader keeps only the last text you opened, on this phone, so you can continue later.</string>
+    <string name="help_q_clipboard">Why does Android say QVoice pasted from the clipboard?</string>
+    <string name="help_a_clipboard">Android shows that whenever an app reads the clipboard. QVoice reads it only when you tap Paste in the reader or use Read copied text.</string>
+    <string name="help_q_storage">How do I free up storage?</string>
+    <string name="help_a_storage">Delete voices you don\'t use: Voices › the voice › Delete. The built-in voice is part of the app.</string>
+    <string name="help_more_title">Still stuck?</string>
+    <string name="help_more_body">Write to us. The email starts with your phone\'s details, which you see before sending.</string>
+
+    <!-- Home, only while Android restricts QVoice in the background (BatteryCheck). -->
+    <string name="battery_title">Battery saving can stop QVoice</string>
+    <string name="battery_body">Android restricts QVoice in the background: reading can stop when the screen turns off, and apps that speak with QVoice can go quiet. In QVoice\'s app settings, open Battery and choose Unrestricted.</string>
 
     <!-- Read aloud: the reader screen, "Read aloud" in text selections, Share. -->
     <string name="reader_action">Read aloud</string>
@@ -154,6 +189,7 @@
     <string name="reader_problem_audio">Another app is using the sound (a call?). Try again when it\'s done.</string>
     <string name="reader_position">%1$d of %2$d</string>
     <string name="reader_finished">Finished</string>
+    <string name="reader_preparing">Preparing the voice…</string>
     <string name="reader_now_reading">Now reading</string>
     <string name="reader_read_from_here">Read from here</string>
     <string name="reader_play">Read aloud</string>

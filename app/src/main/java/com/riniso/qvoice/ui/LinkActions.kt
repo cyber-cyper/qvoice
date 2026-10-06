@@ -35,6 +35,43 @@ internal fun openUrl(context: Context, url: String, inPackage: String? = null): 
 }
 
 /**
+ * QVoice's own page in Android's settings (App info), where Battery and the
+ * other per-app settings are. Every Android version has it; the battery page
+ * itself has no public address.
+ */
+internal fun openAppSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        // A settings app without it (not seen on real phones): nothing to open.
+    }
+}
+
+/**
+ * The phone's text-to-speech settings (Preferred engine). The first intent
+ * is the one Android's own Settings app exports for that page; it isn't
+ * public API, so the accessibility settings (which contain it) and then the
+ * settings' front page follow, and Help names the path to tap.
+ */
+internal fun openTtsSettings(context: Context) {
+    val candidates = listOf(
+        Intent("com.android.settings.TTS_SETTINGS"),
+        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS),
+        Intent(Settings.ACTION_SETTINGS),
+    )
+    for (intent in candidates) {
+        try {
+            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            return
+        } catch (e: ActivityNotFoundException) {
+            // try the next one
+        }
+    }
+}
+
+/**
  * QVoice's page on Google Play, in the Play Store app when there is one.
  * A plain link, as Google advises for a button the user taps; the in-app
  * review card is for prompts QVoice would show by itself, which it doesn't.

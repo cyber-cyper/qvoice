@@ -1,0 +1,13 @@
+# Text files are stored with LF line endings in the repository; Git for
+# Windows may check them out with CRLF, which Gradle and Kotlin don't mind.
+* text=auto
+# Shell scripts run on Linux (GitHub's builds, the authoring sandbox): LF always.
+*.sh text eol=lf
+# Never treated as text.
+*.png binary
+*.webp binary
+*.jar binary
+*.aar binary
+*.zip binary
+*.onnx binary
+*.bin binary

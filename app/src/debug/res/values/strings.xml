@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug builds only: names that tell the test build (com.riniso.qvoice.debug)
+  apart from the version installed from Google Play, on the launcher and in
+  Android's text-to-speech settings. Everything else comes from src/main.
+-->
+<resources>
+    <string name="app_name">QVoice debug</string>
+    <string name="engine_label">QVoice Text-to-Speech (debug)</string>
+</resources>

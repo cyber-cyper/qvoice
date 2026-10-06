@@ -1,0 +1,93 @@
+# Builds and tests every push and pull request with the real Android tools:
+# the Compose compiler's code generation, resource merging, R8's input,
+# lint and the real unit-test runner, none of which the authoring sandbox
+# can run. The debug APK of each run can be downloaded from the run's page
+# (Artifacts). See README.md, "Publishing the source".
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch replaces a build still running.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      # AGP 9.2 needs JDK 17 or newer; 17 is what the app targets.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # The ~110 MB of binary files kept out of git. The key is the script
+      # that holds every URL and checksum, so a new file means a new cache;
+      # the script re-checks whatever the cache restores.
+      - name: Restore binary files
+        uses: actions/cache@v6
+        with:
+          path: |
+            app/libs/sherpa-onnx-1.13.8.aar
+            app/src/main/assets/bundled/kitten-nano-en
+            app/src/main/assets/bundled/espeak-ng-data.zip
+          key: binaries-${{ hashFiles('tools/get-binaries.ps1') }}
+
+      - name: Fetch and check binary files
+        shell: pwsh
+        run: ./tools/get-binaries.ps1
+
+      - name: Static checks
+        run: python3 tools/check_project.py
+
+      # No Gradle wrapper in the repository (Android Studio reads the
+      # version from gradle/wrapper/gradle-wrapper.properties); this installs
+      # the same Gradle and caches its downloads between runs.
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.4.1'
+
+      - name: Unit tests and debug build
+        run: gradle test assembleDebug
+
+      # What a Play upload goes through, so it fails here and not in Android
+      # Studio's "Generate Signed App Bundle": R8 shrinking (a missing keep
+      # rule crashes only release builds), resource shrinking and lint's
+      # release checks. Unsigned and never distributed; the source URL is the
+      # real one from gradle.properties.
+      - name: Release build check (R8, lint)
+        run: gradle assembleRelease
+
+      # Reported, not yet enforced: lint has never run on this code before
+      # (the sandbox can't run it). Once a run comes back clean, this step
+      # loses continue-on-error and becomes a gate like the others.
+      - name: Lint
+        continue-on-error: true
+        run: gradle lintDebug
+
+      - name: Upload the debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: qvoice-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+      - name: Upload test and lint reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: app/build/reports/
+          if-no-files-found: ignore
+          retention-days: 14

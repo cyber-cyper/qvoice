@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Read by Android's text-to-speech settings: the cog next to QVoice opens settingsActivity. -->
+<tts-engine xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.riniso.qvoice.ui.MainActivity" />

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Same as the Compose theme's background (ui/Theme.kt), so opening the app shows no flash. -->
+    <color name="window_background">#FFFBFAFF</color>
+    <!-- Launcher shortcut icons: primaryContainer of ui/Theme.kt behind the indigo glyph. -->
+    <color name="shortcut_background">#FFE3DFFF</color>
+</resources>

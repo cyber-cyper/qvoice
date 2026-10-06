@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher label: short on purpose (longer names are cut under the icon).
+         The Play listing's title is "QVoice Text To Speech Offline". -->
+    <string name="app_name">QVoice</string>
+    <!-- The engine's name in Android's text-to-speech settings. -->
+    <string name="engine_label">QVoice Text-to-Speech</string>
+
+    <!-- Home: engine status -->
+    <string name="status_connecting">Starting the voice engine…</string>
+    <string name="status_engine_failed">The voice engine could not start. Restart the app; if it keeps failing, please report it.</string>
+    <string name="status_is_default_title">QVoice is your phone\'s voice</string>
+    <string name="status_is_default_body">Apps that read aloud now use QVoice.</string>
+    <string name="action_open_tts_settings">Open text-to-speech settings</string>
+    <string name="action_tts_settings_short">Text-to-speech settings</string>
+
+    <!-- Home: first-run setup card (shown until QVoice is the preferred engine) -->
+    <string name="setup_title">Make QVoice your phone\'s voice</string>
+    <string name="setup_body">Then every app that reads aloud — screen readers, e-book readers, maps — speaks with QVoice, even offline.</string>
+    <string name="setup_steps">In the settings that open, tap “Preferred engine” and choose “QVoice Text-to-Speech”.</string>
+    <string name="setup_note">Riniso apps can use QVoice without this step.</string>
+
+    <!-- Home: try it -->
+    <string name="try_title">Try it</string>
+    <string name="try_text_label">Text to speak</string>
+    <string name="try_speed">Speed %1$sx</string>
+    <string name="try_pitch">Pitch %1$sx</string>
+    <string name="action_speak">Speak</string>
+    <string name="action_stop">Stop</string>
+    <string name="timing_started">Speech started after %1$d ms</string>
+    <string name="timing_done">Speech started after %1$d ms · finished after %2$d ms</string>
+    <string name="timing_speed_fast">This voice runs %1$s× faster than real time on this phone (%2$d CPU threads).</string>
+    <string name="timing_speed_slow">This voice runs slower than real time on this phone (%1$s×, %2$d CPU threads), so it will pause between sentences.</string>
+    <string name="threads_label">CPU threads: %1$s</string>
+    <string name="threads_auto">Automatic (%1$d)</string>
+    <string name="threads_dialog_title">CPU threads for speech</string>
+    <string name="threads_dialog_body">More threads can make voices faster on phones with several fast cores, and use more battery. Automatic uses %1$d on this phone. To compare, pick a number, tap Speak twice and look at the speed shown.</string>
+    <string name="error_speak">That didn\'t work (error %1$d).</string>
+
+    <!-- Home: voices -->
+    <string name="voices_title">Voices on this phone</string>
+    <string name="voice_subtitle">%1$s · %2$s · %3$s</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_unknown">Voice</string>
+    <string name="voice_default_badge">Default</string>
+    <string name="speed_short_fast">Fast on this phone</string>
+    <string name="speed_short_keeps_up">Keeps up on this phone</string>
+    <string name="speed_short_slow">Slow on this phone</string>
+    <string name="action_make_default">Make default</string>
+    <string name="action_preview">Play a sample of %1$s</string>
+    <string name="voice_selected">Selected for “Try it”</string>
+    <string name="home_language_title">Language</string>
+    <string name="home_more_voices_title">More voices</string>
+    <string name="home_more_voices_body">Download natural voices in %1$d languages, from small and fast to studio quality.</string>
+    <string name="action_get_more_voices">Get more voices</string>
+
+    <!-- Voice library -->
+    <string name="library_title">Voices</string>
+    <string name="library_installed_title">On this phone</string>
+    <string name="library_available_title">Available to download</string>
+    <string name="library_free_space">%1$s free on this phone</string>
+    <string name="library_empty_catalogue">The voice list could not be read. Please reinstall QVoice.</string>
+    <string name="pack_languages_more">%1$s and %2$d more</string>
+    <string name="pack_sizes_download">%1$s download · %2$s on your phone</string>
+    <string name="pack_size_installed">%1$s on your phone</string>
+    <string name="pack_built_in">Built in</string>
+    <string name="pack_installed">Installed</string>
+    <string name="pack_update_available">Update available</string>
+    <string name="action_download">Download</string>
+    <string name="action_update">Update</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_licence">Licence: %1$s</string>
+    <string name="state_queued">Waiting to start…</string>
+    <string name="state_downloading">%1$s of %2$s</string>
+    <string name="state_waiting_network">Waiting for a connection…</string>
+    <string name="state_waiting_wifi">Waiting for Wi-Fi…</string>
+    <string name="state_retrying">Connection lost; trying again soon…</string>
+    <string name="state_verifying">Checking the download…</string>
+    <string name="state_installing">Installing… %1$d%%</string>
+    <string name="state_deleting">Removing…</string>
+    <string name="problem_no_space">Not enough free space. Free up some space and try again.</string>
+    <string name="problem_network">The download failed. Check your connection and try again.</string>
+    <string name="problem_gone">This voice is no longer available for download. Update QVoice to get the current list.</string>
+    <string name="problem_no_storage">Your phone\'s shared storage isn\'t available right now, so the voice can\'t be downloaded.</string>
+    <string name="problem_checksum">The downloaded file was damaged or has changed. Try again.</string>
+    <string name="problem_install">The voice couldn\'t be installed. Try again.</string>
+    <string name="download_notification_description">QVoice voice download</string>
+
+    <!-- Voice library: each voice's speed on this phone (measured, or expected before download) -->
+    <string name="speed_fast_measured">Fast on this phone · %1$s× real time</string>
+    <string name="speed_keeps_up_measured">Keeps up on this phone · %1$s× real time</string>
+    <string name="speed_slow_measured">Slow on this phone · %1$s× real time, so it pauses between sentences</string>
+    <string name="speed_fast_expected">Expected to be fast on this phone · about %1$s× real time</string>
+    <string name="speed_keeps_up_expected">Expected to keep up on this phone · about %1$s× real time</string>
+    <string name="speed_slow_expected">Expected to be slow on this phone · about %1$s× real time, so it would pause between sentences</string>
+    <string name="dialog_slow_title">Slow on this phone</string>
+    <string name="dialog_slow_body_expected">%1$s is expected to run at about %2$s× real time on this phone, so it would pause while it speaks. Voices marked “fast on this phone” speak without pauses.</string>
+    <string name="dialog_slow_body_measured">%1$s ran at about %2$s× real time on this phone, so it pauses while it speaks. Voices marked “fast on this phone” speak without pauses.</string>
+    <string name="action_download_anyway">Download anyway</string>
+
+    <!-- Voice library dialogs -->
+    <string name="dialog_metered_title">Download over mobile data?</string>
+    <string name="dialog_metered_body">%1$s is %2$s. Over Wi-Fi it doesn\'t use your data plan.</string>
+    <string name="action_wait_for_wifi">Wait for Wi-Fi</string>
+    <string name="action_download_now">Download now</string>
+    <string name="dialog_space_title">Not enough space</string>
+    <string name="dialog_space_body">%1$s needs %2$s free while it installs. This phone has %3$s free.</string>
+    <string name="dialog_delete_title">Delete %1$s?</string>
+    <string name="dialog_delete_body">Apps that use these voices will switch to another voice. You can download it again at any time.</string>
+    <string name="dialog_accept_title">Licence for %1$s</string>
+    <string name="dialog_accept_body">This voice is licensed under OpenRAIL-M. You may use it freely, except for what the licence forbids (its Attachment A) — for example harming or harassing people, impersonating someone, or presenting generated speech as a real person\'s words to deceive. Please read the licence before downloading.</string>
+    <string name="action_accept_and_download">Accept and download</string>
+
+    <!-- About -->
+    <string name="about_title">About QVoice</string>
+    <string name="action_about">About QVoice</string>
+    <string name="action_back">Back</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_tagline">Natural voices for every app, fully offline.</string>
+    <string name="about_licence_title">Free software</string>
+    <string name="about_licence_body">QVoice is free software under the GNU General Public License, version 3 or later. You can use, study, share and change it. It comes with no warranty.</string>
+    <string name="about_source_title">Source code</string>
+    <string name="about_source_missing">Not published yet (development build).</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_body">Everything QVoice says is generated on your phone: your text never leaves the device, and QVoice collects no data. The reader keeps only the last text you opened, and your place in it, on this phone, so you can continue later. Voices you choose to download come from GitHub, which sees the download request like any website visit.</string>
+    <string name="about_components_title">Open-source components</string>
+    <string name="action_view_licence">View licence</string>
+    <string name="action_close">Close</string>
+    <string name="action_send_feedback">Send feedback</string>
+    <string name="about_feedback_body">Questions, ideas or problems: %1$s</string>
+    <string name="feedback_no_email_app">No email app found. Write to %1$s</string>
+    <string name="action_rate">Rate QVoice</string>
+    <string name="about_rate_body">Tell others what you think, on Google Play</string>
+    <string name="action_privacy_policy">Read the privacy policy</string>
+
+    <!-- Read aloud: the reader screen, "Read aloud" in text selections, Share. -->
+    <string name="reader_action">Read aloud</string>
+    <string name="reader_title">Read aloud</string>
+    <string name="reader_text_label">Text to read</string>
+    <string name="reader_tip">Anywhere on your phone: select text and choose Read aloud, or share text to QVoice.</string>
+    <string name="reader_link_only">QVoice reads text, not web pages. On the page, select the text and choose Read aloud.</string>
+    <string name="reader_file_unreadable">QVoice couldn\'t read that file. It reads plain text files (.txt); from other documents, select the text and choose Read aloud, or paste it here.</string>
+    <string name="reader_clipboard_empty">There\'s no text on the clipboard. Copy some text, then try again.</string>
+    <string name="reader_clipboard_sensitive">The copied text is marked as private, like a password, so QVoice didn\'t read it out.</string>
+    <string name="action_read_anyway">Read it anyway</string>
+    <string name="reader_file_unreadable_kept">QVoice couldn\'t read that file. It reads plain text files (.txt); from other documents, select the text and choose Read aloud.</string>
+    <string name="reader_truncated">This text is long: only its first %1$s characters will be read.</string>
+    <string name="reader_problem_no_voice">No installed voice reads this paragraph\'s writing. Get one in Voices, or skip it.</string>
+    <string name="reader_problem_engine">The voice couldn\'t read this paragraph.</string>
+    <string name="reader_problem_audio">Another app is using the sound (a call?). Try again when it\'s done.</string>
+    <string name="reader_position">%1$d of %2$d</string>
+    <string name="reader_finished">Finished</string>
+    <string name="reader_now_reading">Now reading</string>
+    <string name="reader_read_from_here">Read from here</string>
+    <string name="reader_play">Read aloud</string>
+    <string name="reader_pause">Pause</string>
+    <string name="reader_previous">Previous paragraph</string>
+    <string name="reader_next">Next paragraph</string>
+    <string name="reader_speed_menu">Reading speed</string>
+    <string name="reader_new_text">Read something else</string>
+    <string name="action_back_to_previous_text">Back to the previous text</string>
+    <string name="action_paste">Paste</string>
+    <string name="action_skip">Skip</string>
+    <string name="home_read_title">Read aloud</string>
+    <string name="home_read_body">Select text in any app and choose Read aloud, share text to QVoice, or paste it here. It keeps reading with the screen off.</string>
+    <string name="action_open_reader">Open the reader</string>
+    <string name="action_back_to_reader">Back to the reader</string>
+    <string name="action_continue_listening">Continue listening</string>
+    <string name="action_start_listening">Start listening</string>
+    <string name="action_listen_again">Listen again</string>
+    <string name="home_read_quote">“%1$s”</string>
+    <string name="home_read_playing">Reading · paragraph %1$d of %2$d</string>
+    <string name="home_read_paused">Paused · paragraph %1$d of %2$d</string>
+    <string name="home_read_ready">Paragraph %1$d of %2$d</string>
+
+    <!-- Launcher shortcuts (long-press the icon). Short labels: 10 characters at most. -->
+    <string name="shortcut_read_short">Read aloud</string>
+    <string name="shortcut_read_long">Read text aloud</string>
+    <string name="shortcut_clipboard_short">Clipboard</string>
+    <string name="shortcut_clipboard_long">Read copied text</string>
+    <string name="shortcut_voices_short">Voices</string>
+    <string name="shortcut_voices_long">Get more voices</string>
+
+    <!-- The reading notification (also the lock screen's controls). It never shows the text: lock screens are public. -->
+    <string name="reader_channel">Reading aloud</string>
+    <string name="reader_channel_description">Play, pause and skip while QVoice reads to you, also from the lock screen. The text itself is never shown here.</string>
+    <string name="reader_notice_position">Paragraph %1$d of %2$d</string>
+    <string name="reader_notice_no_voice">Paused: no voice reads this paragraph\'s writing</string>
+    <string name="reader_notice_engine">Paused: the voice couldn\'t read this paragraph</string>
+    <string name="reader_notice_audio">Paused: another app is using the sound</string>
+    <string name="reader_notice_sleep">%1$s · stops at %2$s</string>
+
+    <!-- The sleep timer (the reader's top bar). -->
+    <string name="reader_sleep_timer">Sleep timer</string>
+    <string name="reader_sleep_minutes">%1$d minutes</string>
+    <string name="reader_sleep_until">Stops at %1$s</string>
+    <string name="reader_sleep_active">Sleep timer, stops at %1$s</string>
+    <string name="reader_sleep_note">Reading stops at the end of the paragraph then.</string>
+    <string name="reader_sleep_off">Turn off</string>
+
+    <!-- The voice choice (the reader's top bar). It sets the language's default voice, as Home's "Make default" does. -->
+    <string name="reader_voice">Voice</string>
+    <string name="reader_voice_title">Voice for %1$s</string>
+    <string name="reader_voice_note">Used for %1$s by every app that reads aloud; you can also change it on Home.</string>
+    <string name="reader_voice_none">No installed voice reads this paragraph\'s writing.</string>
+
+    <plurals name="pack_voice_count">
+        <item quantity="one">%1$d voice</item>
+        <item quantity="other">%1$d voices</item>
+    </plurals>
+</resources>

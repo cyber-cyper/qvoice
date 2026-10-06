@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 and older (android:fullBackupContent).
+  Opt-in list: only the settings file is backed up. Voices are large and
+  re-downloadable, so they stay out. Use <include> only — an <exclude> for a
+  path that isn't included fails the release build's lint check.
+-->
+<full-backup-content>
+    <include domain="sharedpref" path="qvoice_settings.xml" />
+</full-backup-content>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Voice downloads only. INTERNET: DownloadManager fetches voices on
+      QVoice's behalf. ACCESS_NETWORK_STATE: to ask before a large download
+      on mobile data. Both are "normal" permissions (no prompt). The engine
+      itself never uses the network: text never leaves the phone.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--
+      Listening with the screen off (the reader, see ReadAloudService): a
+      foreground service of type "media playback" while a listening session
+      lasts, and a partial wake lock while it reads, so the phone doesn't
+      sleep while the voice computes the next sentence. All three are
+      "normal" permissions (no prompt). No POST_NOTIFICATIONS: media-session
+      notifications are exempt from it on Android 13+.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:name=".QVoiceApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.QVoice">
+
+        <!--
+          Launcher activity. Also the CONFIGURE_ENGINE target, so the cog next
+          to QVoice in Android's text-to-speech settings opens it (older
+          releases use this intent; newer ones read settingsActivity from
+          xml/tts_engine.xml, which points here too).
+          adjustResize: the window reports the keyboard as insets, which
+          Compose's imePadding needs to keep "Try it" visible while typing.
+        -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.CONFIGURE_ENGINE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- Long-press the launcher icon: "Read aloud" and "Voices". -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <!--
+          The reader. "Read aloud" in every app's text-selection menu
+          (PROCESS_TEXT) and in the Share sheet for text (SEND); Home and the
+          reading notification open it too. Exported by design, like any
+          share target: other apps hand it text, and all it does with that
+          text is show it and read it aloud.
+          singleTask in a task of its own: one reader, which the notification
+          and Home bring back (a new share replaces its text), and which
+          doesn't stay stacked on top of the app the text came from. A caller
+          asking for a result gets "cancelled" at once; the reader never
+          returns one.
+        -->
+        <activity
+            android:name=".ui.ReaderActivity"
+            android:exported="true"
+            android:label="@string/reader_action"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.reader"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          The system TTS engine.
+          - Its label is what Android's text-to-speech settings (Preferred
+            engine) and apps listing engines show: "QVoice Text-to-Speech"
+            says what it is next to "Speech Services by Google"; the launcher
+            keeps the short app name.
+          - DEFAULT category is required: Android finds engines with an
+            implicit intent and skips services without it.
+          - NO android:permission, deliberately. A TTS engine is public API.
+            On Android 11 and older the client app binds the engine itself,
+            so any permission here (HayaiTTS used BIND_TEXT_SERVICE, which
+            only the system holds) breaks TextToSpeech() for every ordinary
+            app, including the Riniso apps. Lint's ExportedService warning
+            is therefore expected.
+        -->
+        <service
+            android:name=".service.QVoiceTtsService"
+            android:exported="true"
+            android:label="@string/engine_label"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.intent.action.TTS_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech.tts"
+                android:resource="@xml/tts_engine" />
+        </service>
+
+        <!--
+          Listening with the screen off: the reader's media notification and
+          session while it reads. Started only by QVoice itself.
+        -->
+        <service
+            android:name=".reader.ReadAloudService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- The reading notification's buttons; only QVoice's own notification sends them. -->
+        <receiver
+            android:name=".reader.ReadAloudActionReceiver"
+            android:exported="false" />
+
+        <!--
+          DownloadManager's "finished" broadcast, sent by the download
+          provider (another app), so the receiver must be exported. No
+          sender permission on purpose: if an OEM build's provider lacked it,
+          installs would silently wait until QVoice is opened. A spoofed
+          broadcast can't do anything: the library only acts on what
+          DownloadManager itself reports for QVoice's own downloads.
+        -->
+        <receiver
+            android:name=".download.DownloadCompleteReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Unpacks finished downloads (see InstallJobService). -->
+        <service
+            android:name=".download.InstallJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- Android's TTS settings call these three; all finish immediately. -->
+        <activity
+            android:name=".service.CheckVoiceDataActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.CHECK_TTS_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".service.GetSampleTextActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.GET_SAMPLE_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".service.InstallVoiceDataActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.INSTALL_TTS_DATA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

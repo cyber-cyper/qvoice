@@ -1,0 +1,939 @@
+{
+ "schema": 1,
+ "version": 2,
+ "voices": [
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "kokoro-multi-lang-v1_0",
+    "family": "kokoro",
+    "name": "Kokoro",
+    "version": 1,
+    "sampleRate": 24000,
+    "languages": [
+     "en-US",
+     "en-GB",
+     "es",
+     "fr-FR",
+     "hi-IN",
+     "it-IT",
+     "pt-BR",
+     "zh-CN"
+    ],
+    "quality": "high",
+    "files": {
+     "model": "model.onnx",
+     "tokens": "tokens.txt",
+     "voices": "voices.bin"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 3,
+      "key": "af_heart",
+      "name": "Heart",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "very_high"
+     },
+     {
+      "sid": 2,
+      "key": "af_bella",
+      "name": "Bella",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "very_high"
+     },
+     {
+      "sid": 6,
+      "key": "af_nicole",
+      "name": "Nicole",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 1,
+      "key": "af_aoede",
+      "name": "Aoede",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 5,
+      "key": "af_kore",
+      "name": "Kore",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 9,
+      "key": "af_sarah",
+      "name": "Sarah",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 14,
+      "key": "am_fenrir",
+      "name": "Fenrir",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 16,
+      "key": "am_michael",
+      "name": "Michael",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 18,
+      "key": "am_puck",
+      "name": "Puck",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 0,
+      "key": "af_alloy",
+      "name": "Alloy",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 7,
+      "key": "af_nova",
+      "name": "Nova",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 10,
+      "key": "af_sky",
+      "name": "Sky",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 4,
+      "key": "af_jessica",
+      "name": "Jessica",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 8,
+      "key": "af_river",
+      "name": "River",
+      "gender": "female",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 12,
+      "key": "am_echo",
+      "name": "Echo",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 13,
+      "key": "am_eric",
+      "name": "Eric",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 15,
+      "key": "am_liam",
+      "name": "Liam",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 17,
+      "key": "am_onyx",
+      "name": "Onyx",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 19,
+      "key": "am_santa",
+      "name": "Santa",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 11,
+      "key": "am_adam",
+      "name": "Adam",
+      "gender": "male",
+      "languages": [
+       "en-US"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 21,
+      "key": "bf_emma",
+      "name": "Emma",
+      "gender": "female",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 22,
+      "key": "bf_isabella",
+      "name": "Isabella",
+      "gender": "female",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 25,
+      "key": "bm_fable",
+      "name": "Fable",
+      "gender": "male",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 26,
+      "key": "bm_george",
+      "name": "George",
+      "gender": "male",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 27,
+      "key": "bm_lewis",
+      "name": "Lewis",
+      "gender": "male",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 20,
+      "key": "bf_alice",
+      "name": "Alice",
+      "gender": "female",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 23,
+      "key": "bf_lily",
+      "name": "Lily",
+      "gender": "female",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 24,
+      "key": "bm_daniel",
+      "name": "Daniel",
+      "gender": "male",
+      "languages": [
+       "en-GB"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 28,
+      "key": "ef_dora",
+      "name": "Dora",
+      "gender": "female",
+      "languages": [
+       "es"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 29,
+      "key": "em_alex",
+      "name": "Alex",
+      "gender": "male",
+      "languages": [
+       "es"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 53,
+      "key": "em_santa",
+      "name": "Santa",
+      "gender": "male",
+      "languages": [
+       "es"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 30,
+      "key": "ff_siwis",
+      "name": "Siwis",
+      "gender": "female",
+      "languages": [
+       "fr-FR"
+      ],
+      "quality": "high"
+     },
+     {
+      "sid": 31,
+      "key": "hf_alpha",
+      "name": "Alpha",
+      "gender": "female",
+      "languages": [
+       "hi-IN"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 32,
+      "key": "hf_beta",
+      "name": "Beta",
+      "gender": "female",
+      "languages": [
+       "hi-IN"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 33,
+      "key": "hm_omega",
+      "name": "Omega",
+      "gender": "male",
+      "languages": [
+       "hi-IN"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 34,
+      "key": "hm_psi",
+      "name": "Psi",
+      "gender": "male",
+      "languages": [
+       "hi-IN"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 35,
+      "key": "if_sara",
+      "name": "Sara",
+      "gender": "female",
+      "languages": [
+       "it-IT"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 36,
+      "key": "im_nicola",
+      "name": "Nicola",
+      "gender": "male",
+      "languages": [
+       "it-IT"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 42,
+      "key": "pf_dora",
+      "name": "Dora",
+      "gender": "female",
+      "languages": [
+       "pt-BR"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 43,
+      "key": "pm_alex",
+      "name": "Alex",
+      "gender": "male",
+      "languages": [
+       "pt-BR"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 44,
+      "key": "pm_santa",
+      "name": "Santa",
+      "gender": "male",
+      "languages": [
+       "pt-BR"
+      ],
+      "quality": "normal"
+     },
+     {
+      "sid": 45,
+      "key": "zf_xiaobei",
+      "name": "Xiaobei",
+      "gender": "female",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 47,
+      "key": "zf_xiaoxiao",
+      "name": "Xiaoxiao",
+      "gender": "female",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 48,
+      "key": "zf_xiaoyi",
+      "name": "Xiaoyi",
+      "gender": "female",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 49,
+      "key": "zm_yunjian",
+      "name": "Yunjian",
+      "gender": "male",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 50,
+      "key": "zm_yunxi",
+      "name": "Yunxi",
+      "gender": "male",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 51,
+      "key": "zm_yunxia",
+      "name": "Yunxia",
+      "gender": "male",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     },
+     {
+      "sid": 52,
+      "key": "zm_yunyang",
+      "name": "Yunyang",
+      "gender": "male",
+      "languages": [
+       "zh-CN"
+      ],
+      "quality": "low"
+     }
+    ],
+    "defaultSpeaker": "af_heart",
+    "license": {
+     "name": "Apache-2.0",
+     "holder": "hexgrad (Kokoro-82M)",
+     "url": "https://huggingface.co/hexgrad/Kokoro-82M"
+    },
+    "languageConfig": {
+     "en-US": {
+      "espeakVoice": "en-us",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "en-GB": {
+      "espeakVoice": "en",
+      "lexicons": [
+       "lexicon-gb-en.txt"
+      ]
+     },
+     "es": {
+      "espeakVoice": "es",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "fr-FR": {
+      "espeakVoice": "fr",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "hi-IN": {
+      "espeakVoice": "hi",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "it-IT": {
+      "espeakVoice": "it",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "pt-BR": {
+      "espeakVoice": "pt-br",
+      "lexicons": [
+       "lexicon-us-en.txt"
+      ]
+     },
+     "zh-CN": {
+      "espeakVoice": "cmn",
+      "lexicons": [
+       "lexicon-us-en.txt",
+       "lexicon-zh.txt"
+      ],
+      "dictDir": "dict",
+      "ruleFsts": [
+       "date-zh.fst",
+       "number-zh.fst",
+       "phone-zh.fst"
+      ]
+     }
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2",
+    "sha256": "c5f7e2d2caf082bc1d20fb70334a61d99d20b484500aad32e7cf84c128ea3298",
+    "size": 349906910,
+    "format": "tar.bz2",
+    "root": "kokoro-multi-lang-v1_0"
+   },
+   "installedSize": 383247646,
+   "summary": "Natural, expressive voices in English (US and UK), Hindi, Spanish, French, Italian, Portuguese (Brazil) and Chinese. Needs a recent phone.",
+   "speedHint": 0.17
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "sherpa-onnx-supertonic-3-tts-int8-2026-05-11",
+    "family": "supertonic",
+    "name": "Supertonic 3",
+    "version": 1,
+    "sampleRate": 44100,
+    "languages": [
+     "en",
+     "ko-KR",
+     "ja-JP",
+     "ar",
+     "bg-BG",
+     "cs-CZ",
+     "da-DK",
+     "de",
+     "el-GR",
+     "es",
+     "et-EE",
+     "fi-FI",
+     "fr",
+     "hi-IN",
+     "hr-HR",
+     "hu-HU",
+     "id-ID",
+     "it-IT",
+     "lt-LT",
+     "lv-LV",
+     "nl",
+     "pl-PL",
+     "pt",
+     "ro-RO",
+     "ru",
+     "sk-SK",
+     "sl-SI",
+     "sv-SE",
+     "tr-TR",
+     "uk-UA",
+     "vi-VN"
+    ],
+    "quality": "high",
+    "files": {
+     "model": "vector_estimator.int8.onnx",
+     "extra": {
+      "duration_predictor": "duration_predictor.int8.onnx",
+      "text_encoder": "text_encoder.int8.onnx",
+      "vector_estimator": "vector_estimator.int8.onnx",
+      "vocoder": "vocoder.int8.onnx",
+      "tts_json": "tts.json",
+      "unicode_indexer": "unicode_indexer.bin",
+      "voice_style": "voice.bin"
+     }
+    },
+    "espeakData": "none",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "f1",
+      "name": "F1",
+      "gender": "female"
+     },
+     {
+      "sid": 1,
+      "key": "f2",
+      "name": "F2",
+      "gender": "female"
+     },
+     {
+      "sid": 2,
+      "key": "f3",
+      "name": "F3",
+      "gender": "female"
+     },
+     {
+      "sid": 3,
+      "key": "f4",
+      "name": "F4",
+      "gender": "female"
+     },
+     {
+      "sid": 4,
+      "key": "f5",
+      "name": "F5",
+      "gender": "female"
+     },
+     {
+      "sid": 5,
+      "key": "m1",
+      "name": "M1",
+      "gender": "male"
+     },
+     {
+      "sid": 6,
+      "key": "m2",
+      "name": "M2",
+      "gender": "male"
+     },
+     {
+      "sid": 7,
+      "key": "m3",
+      "name": "M3",
+      "gender": "male"
+     },
+     {
+      "sid": 8,
+      "key": "m4",
+      "name": "M4",
+      "gender": "male"
+     },
+     {
+      "sid": 9,
+      "key": "m5",
+      "name": "M5",
+      "gender": "male"
+     }
+    ],
+    "defaultSpeaker": "f1",
+    "license": {
+     "name": "OpenRAIL-M",
+     "holder": "Supertone Inc.",
+     "url": "https://huggingface.co/Supertone/supertonic-3"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2",
+    "sha256": "82fa96f91c4ef8abaae3a14a3f4153facf88bed821d1f7331cec2700f432c427",
+    "size": 128774318,
+    "format": "tar.bz2",
+    "root": "sherpa-onnx-supertonic-3-tts-int8-2026-05-11"
+   },
+   "installedSize": 145316356,
+   "summary": "Ten voices that speak 31 languages, including Hindi, Arabic, Korean, Japanese, Russian and most European languages.",
+   "speedHint": 0.45,
+   "acceptance": "openrail-m"
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "vits-piper-en_US-ljspeech-medium",
+    "family": "vits",
+    "name": "LJ (Piper)",
+    "version": 1,
+    "sampleRate": 22050,
+    "languages": [
+     "en-US"
+    ],
+    "quality": "normal",
+    "files": {
+     "model": "en_US-ljspeech-medium.onnx",
+     "tokens": "tokens.txt"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "lj",
+      "name": "LJ",
+      "gender": "female"
+     }
+    ],
+    "defaultSpeaker": "lj",
+    "license": {
+     "name": "MIT",
+     "holder": "Bryce Beattie · rhasspy/piper-voices",
+     "url": "https://huggingface.co/rhasspy/piper-voices"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-ljspeech-medium.tar.bz2",
+    "sha256": "3dfb4b759d8be032a4903a9538d128b0fda2a06ab1de6cbc2d93a97e2dd83dba",
+    "size": 67169893,
+    "format": "tar.bz2",
+    "root": "vits-piper-en_US-ljspeech-medium"
+   },
+   "installedSize": 63537936,
+   "summary": "Clear, fast voice that suits any phone. Public-domain recordings (LJ Speech).",
+   "speedHint": 1.8
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "vits-piper-en_US-kristin-medium",
+    "family": "vits",
+    "name": "Kristin (Piper)",
+    "version": 1,
+    "sampleRate": 22050,
+    "languages": [
+     "en-US"
+    ],
+    "quality": "normal",
+    "files": {
+     "model": "en_US-kristin-medium.onnx",
+     "tokens": "tokens.txt"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "kristin",
+      "name": "Kristin",
+      "gender": "female"
+     }
+    ],
+    "defaultSpeaker": "kristin",
+    "license": {
+     "name": "MIT",
+     "holder": "Bryce Beattie · rhasspy/piper-voices",
+     "url": "https://huggingface.co/rhasspy/piper-voices"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-kristin-medium.tar.bz2",
+    "sha256": "c2206f572df2956c50b1ae3367eebce3853c663e890cba8048cd62b1e4dbe6c7",
+    "size": 67259230,
+    "format": "tar.bz2",
+    "root": "vits-piper-en_US-kristin-medium"
+   },
+   "installedSize": 63537894,
+   "summary": "Clear, fast voice that suits any phone. Public-domain recordings (LibriVox).",
+   "speedHint": 1.8
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "vits-piper-en_US-norman-medium",
+    "family": "vits",
+    "name": "Norman (Piper)",
+    "version": 1,
+    "sampleRate": 22050,
+    "languages": [
+     "en-US"
+    ],
+    "quality": "normal",
+    "files": {
+     "model": "en_US-norman-medium.onnx",
+     "tokens": "tokens.txt"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "norman",
+      "name": "Norman",
+      "gender": "male"
+     }
+    ],
+    "defaultSpeaker": "norman",
+    "license": {
+     "name": "MIT",
+     "holder": "Bryce Beattie · rhasspy/piper-voices",
+     "url": "https://huggingface.co/rhasspy/piper-voices"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-norman-medium.tar.bz2",
+    "sha256": "1f32065d480abe9abc7c7f91442125d0b34c1cc065d1e600466cac408eabf3b8",
+    "size": 67203672,
+    "format": "tar.bz2",
+    "root": "vits-piper-en_US-norman-medium"
+   },
+   "installedSize": 63537943,
+   "summary": "Clear, fast voice that suits any phone. Public-domain recordings (LibriVox).",
+   "speedHint": 1.8
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "vits-piper-en_US-john-medium",
+    "family": "vits",
+    "name": "John (Piper)",
+    "version": 1,
+    "sampleRate": 22050,
+    "languages": [
+     "en-US"
+    ],
+    "quality": "normal",
+    "files": {
+     "model": "en_US-john-medium.onnx",
+     "tokens": "tokens.txt"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "john",
+      "name": "John",
+      "gender": "male"
+     }
+    ],
+    "defaultSpeaker": "john",
+    "license": {
+     "name": "MIT",
+     "holder": "Bryce Beattie · rhasspy/piper-voices",
+     "url": "https://huggingface.co/rhasspy/piper-voices"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_US-john-medium.tar.bz2",
+    "sha256": "d90362cfa48e429d3096f644785184446145b6e38216f2eaf4c0601b8aad5a36",
+    "size": 67249181,
+    "format": "tar.bz2",
+    "root": "vits-piper-en_US-john-medium"
+   },
+   "installedSize": 63159373,
+   "summary": "Clear, fast voice that suits any phone. Public-domain recordings (LibriVox).",
+   "speedHint": 1.8
+  },
+  {
+   "manifest": {
+    "schema": 1,
+    "id": "vits-piper-en_GB-cori-medium",
+    "family": "vits",
+    "name": "Cori (Piper)",
+    "version": 1,
+    "sampleRate": 22050,
+    "languages": [
+     "en-GB"
+    ],
+    "quality": "normal",
+    "files": {
+     "model": "en_GB-cori-medium.onnx",
+     "tokens": "tokens.txt"
+    },
+    "espeakData": "shared",
+    "speakers": [
+     {
+      "sid": 0,
+      "key": "cori",
+      "name": "Cori",
+      "gender": "female"
+     }
+    ],
+    "defaultSpeaker": "cori",
+    "license": {
+     "name": "MIT",
+     "holder": "Bryce Beattie · rhasspy/piper-voices",
+     "url": "https://huggingface.co/rhasspy/piper-voices"
+    }
+   },
+   "download": {
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-en_GB-cori-medium.tar.bz2",
+    "sha256": "49c9a5361bbdd95d7ca9687c4de11e5908481f65e7c7c368960df79949fdac2b",
+    "size": 67257412,
+    "format": "tar.bz2",
+    "root": "vits-piper-en_GB-cori-medium"
+   },
+   "installedSize": 63537887,
+   "summary": "Clear, fast voice that suits any phone. Public-domain recordings (LibriVox).",
+   "speedHint": 1.8
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  QVoice launcher icon (minSdk 26, so every device uses this adaptive icon).
+  - background: navy gradient (vector), full 108 dp canvas;
+  - foreground: the logo artwork with its glow (PNG per density), scaled so
+    the owner's square design fills 68 of the 72 dp every mask shows — the Q
+    ring sits inside the 66 dp safe zone, the tail tip stays inside even a
+    circle mask;
+  - monochrome: solid shapes for Android 13+ themed icons.
+  Made by tools/brand/ from the owner's artwork; see tools/brand/README.md.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>

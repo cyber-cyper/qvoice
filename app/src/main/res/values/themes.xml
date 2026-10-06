@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Window theme only; the UI itself is Compose + Material 3 (QVoiceTheme).
+      Framework Material parent, so no AppCompat/MDC dependency is needed.
+      values-night/themes.xml swaps in the dark parent to avoid a white flash.
+    -->
+    <style name="Theme.QVoice" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+</resources>

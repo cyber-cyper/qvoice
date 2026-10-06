@@ -1,0 +1,35 @@
+# Gradle / Android Studio
+.gradle/
+build/
+app/build/
+.idea/
+*.iml
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Machine-specific
+local.properties
+
+# Signing material never goes into the repository
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Binary files: kept out of git, put in place and checked by
+# tools/get-binaries.ps1 (README.md, "Binary files")
+app/libs/*.aar
+app/src/main/assets/bundled/espeak-ng-data.zip
+app/src/main/assets/bundled/kitten-nano-en/
+# Zips of the built-in voice from earlier versions (the script deletes them)
+app/src/main/assets/bundled/kitten-nano-en-v0_8-*.zip
+
+# Python caches (tools/)
+__pycache__/
+*.pyc

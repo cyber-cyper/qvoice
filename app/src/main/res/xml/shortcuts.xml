@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Long-press QVoice's launcher icon: the places people come back for, in
+  this order (the launcher ranks them so). Static shortcuts start their
+  intent in a new, cleared task. For the reader that means its own task
+  (singleTask): it shows what it is reading (or remembers from last time),
+  or the paste field when there is nothing to read. "Read copied text"
+  reads the clipboard aloud at once (ReaderActivity.ACTION_READ_CLIPBOARD),
+  once the reader has focus. For Voices, Home starts on the voice library
+  (MainActivity.EXTRA_SCREEN). Google's advice: four at most, short labels
+  of ten characters or fewer.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_read"
+        android:shortcutId="read_aloud"
+        android:shortcutLongLabel="@string/shortcut_read_long"
+        android:shortcutShortLabel="@string/shortcut_read_short">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.riniso.qvoice.ui.ReaderActivity"
+            android:targetPackage="com.riniso.qvoice" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_clipboard"
+        android:shortcutId="read_clipboard"
+        android:shortcutLongLabel="@string/shortcut_clipboard_long"
+        android:shortcutShortLabel="@string/shortcut_clipboard_short">
+        <intent
+            android:action="com.riniso.qvoice.action.READ_CLIPBOARD"
+            android:targetClass="com.riniso.qvoice.ui.ReaderActivity"
+            android:targetPackage="com.riniso.qvoice" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_voices"
+        android:shortcutId="voices"
+        android:shortcutLongLabel="@string/shortcut_voices_long"
+        android:shortcutShortLabel="@string/shortcut_voices_short">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.riniso.qvoice.ui.MainActivity"
+            android:targetPackage="com.riniso.qvoice">
+            <extra
+                android:name="com.riniso.qvoice.SCREEN"
+                android:value="VOICES" />
+        </intent>
+    </shortcut>
+</shortcuts>

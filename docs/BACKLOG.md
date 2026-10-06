@@ -106,12 +106,10 @@ Each slice is small, self-contained and shippable. Status as of slice 20
 
 ## Next (in order; anything waiting for the owner moves up as soon as it arrives)
 
-- **Waiting for the owner:** the Claude GitHub App installed on
-  cyber-cyper/qvoice (the account is linked; pushes need the app), then the
-  first push and GitHub's build; `store/privacy.html` uploaded to
+- **Waiting for the owner:** `store/privacy.html` uploaded to
   zinijo.com/qvoice/; a test of slices 17-20 on the phone; the Play upload
-  (internal testing, then the closed test); the screenshots and the
-  decisions under "Open decisions".
+  (internal testing, then the closed test, store/RELEASE.md); the
+  screenshots and the decisions under "Open decisions".
 
 The plan below comes from Android's core app quality guidelines, Material
 3, Play's policies and listing guidance, and what users praise and
@@ -192,8 +190,9 @@ first"); Indian-language voices (left to Google's engine for now).
   hands for a while.
 - **What the first users show us:** Play's pre-launch report, Android
   vitals (crashes, ANRs, excessive wake locks), reviews.
-- **Lint as a gate** in the GitHub build, after fixing what its first run
-  reports; a debug keystore shared through the repository (D-044).
+- **A debug keystore shared through the repository** (D-044), so APKs
+  built on GitHub install over local test builds. (Lint became a gate in
+  slice 20: its first run had no errors.)
 - **Voice cloning of the user's own voice** (Pocket / ZipVoice), with
   consent checks, live recording only, no celebrity or third-party voices.
 - **Helper for the Riniso apps** (deferred by the owner). One Kotlin file
@@ -216,11 +215,10 @@ first"); Indian-language voices (left to Google's engine for now).
 Everything Play asks for is drafted in `store/LISTING.md`, step by step in
 `store/RELEASE.md`. What remains needs the owner:
 
-- **The source on GitHub** (https://github.com/cyber-cyper/qvoice exists,
-  empty): link GitHub for Claude, or push it with GitHub Desktop
-  (RELEASE.md step 1). Then the eSpeak NG, piper-phonemize and sherpa-onnx
-  v1.13.8 source archives go into its first release's assets (GPL-3.0 §6;
-  see NOTICE.md).
+- Done: **the source on GitHub** (https://github.com/cyber-cyper/qvoice,
+  pushed in slice 20, its build green) and **the GPL components' source
+  archives** in its release `gpl-sources-1.13.8` (GPL-3.0 §6; NOTICE.md).
+  Each Play build's commit gets a tag (`v1.0.0-build1` for versionCode 1).
 - **The privacy policy page:** upload `store/privacy.html` so it opens at
   https://zinijo.com/qvoice/privacy.html (the address in the app and for
   Play Console).

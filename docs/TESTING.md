@@ -57,7 +57,8 @@ open the project, then the green ▶ Run button installs it on the phone).
 | `tools/get-binaries.ps1` on copies of the project: everything missing (both downloads), everything present (nothing downloaded), the voice from the old zip (no download), a truncated eSpeak NG zip (rebuilt), a damaged old zip and a wrong download checksum (both refused, nothing changed), extra files and leftover zips removed; the zip it builds read with java.util.zip as the app does (same 355 files, same content hash) | (sandbox: PowerShell 7.4) | authoring sandbox |
 | The eSpeak NG zip sent with slice 1 = the voice archive's `espeak-ng-data` folder (rebuilt byte for byte with Python's zipfile, level 9) | (sandbox) | authoring sandbox |
 | GitHub workflow: actionlint, and every action input checked against that action's own `action.yml` at the pinned major version | `actionlint .github/workflows/build.yml` | authoring sandbox |
-| Unit tests, the Compose compiler, a debug APK, lint (reported), an unsigned release build (R8, resource shrinking, lint's release checks) — with the real Android tools, on every push | `.github/workflows/build.yml` | GitHub, once the repository exists |
+| Unit tests, the Compose compiler, a debug APK, lint (a gate since slice 20), an unsigned release build (R8, resource shrinking, lint's release checks) — with the real Android tools, on every push | `.github/workflows/build.yml` | GitHub (first run, slice 20: all green) |
+| The GPL components' source archives, checked against sherpa-onnx's pinned hashes, published as release assets | `.github/workflows/gpl-sources.yml` (on a `gpl-sources-*` tag) | GitHub |
 | Timeline model: per-chunk generation times × the sandbox-to-M31 factor (4.1), with and without read-ahead. Reproduces the 0.2.2 log (Kitten int8: 0.74 s first audio, 5.0 s gap; measured 0.72 s, ~5 s) | (sandbox: Python sherpa-onnx) | authoring sandbox |
 | Same-run sandbox speeds of every family, mapped onto the M31 measurements (the source of the catalogue's speed hints, see tools/catalog/make_catalog.py) | (sandbox: Python sherpa-onnx) | authoring sandbox |
 | Fast speech: model-alone vs Sonic-alone vs model 1.5× + Sonic at 1.5-4×, word error rate by Whisper on ten Harvard sentences, two voices; Sonic pitch on real voices (F0 before/after) — the numbers behind D-041 | (sandbox: Python sherpa-onnx + the vendored Sonic.java) | authoring sandbox |
@@ -132,6 +133,8 @@ named test failed there.
 | Reader memory: a burst of changes costs one write, the latest wins | `aBurstOfChangesCostsOneWriteAndTheLatestWins` |
 | A remembered text never replaces one that arrived first | `aRestoreNeverReplacesATextThatCameFirst` |
 | A clip marked sensitive isn't even fetched unless asked for | `aSensitiveClipIsRefusedWithoutBeingRead` |
+| No deprecated `Locale` constructors (the owner's JDK 21 build warns; the sandbox can't see it) | checker rule 12 (caught the three real ones) |
+| Debug shortcuts match the main ones except the package (2 planted drifts) | checker rule 13 |
 
 The static checker was also run against copies with planted errors (seven
 in slice 1, a bogus member import in slice 2) and reported each.

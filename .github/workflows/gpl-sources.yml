@@ -1,0 +1,72 @@
+# Mirrors the source code of the GPL parts inside QVoice's binary into this
+# repository's releases (GPL-3.0 section 6: the corresponding source must stay
+# available for as long as the app is distributed, so it can't depend on
+# third-party hosting). See NOTICE.md, "Corresponding source".
+#
+# Runs when a tag named gpl-sources-<sherpa-onnx version> is pushed (or by
+# hand): downloads the exact archives sherpa-onnx 1.13.8's build uses, checks
+# them against the hashes sherpa-onnx itself pins, and publishes them with a
+# SHA256SUMS file as that tag's release. A new sherpa-onnx version means a new
+# tag and new hashes here.
+name: GPL sources
+
+on:
+  push:
+    tags: ['gpl-sources-*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download and check the archives
+        run: |
+          set -euo pipefail
+          fetch() { # url, file, sha256 (empty: record only)
+            curl -fsSL --retry 3 --retry-delay 5 -o "$2" "$1"
+            if [ -n "$3" ]; then echo "$3  $2" | sha256sum -c -; fi
+          }
+          # eSpeak NG and piper-phonemize: the URLs and hashes of sherpa-onnx
+          # 1.13.8's cmake/espeak-ng-for-piper.cmake and cmake/piper-phonemize.cmake.
+          fetch https://github.com/csukuangfj/espeak-ng/archive/ed530aa113046142eb5115cf2fc9157854d0ffe1.zip \
+            espeak-ng-ed530aa113046142eb5115cf2fc9157854d0ffe1.zip \
+            e4e262cbe34f7fe21f91f1ba3397f2728e1f30eafbae7853f2b753a9ed13f0dd
+          fetch https://github.com/csukuangfj/piper-phonemize/archive/f3ff95afc03640bc1399e113e83361192a2fafb4.zip \
+            piper-phonemize-f3ff95afc03640bc1399e113e83361192a2fafb4.zip \
+            d9cca4e2bdc7d6dd8dffb96a4668283dbd3f77a9c194a3e530c1e8eba9406a5d
+          # sherpa-onnx itself (the build scripts that make the JNI library):
+          # its v1.13.8 tag. GitHub pins no hash for tag archives; the one
+          # downloaded is recorded in SHA256SUMS.
+          fetch https://github.com/k2-fsa/sherpa-onnx/archive/refs/tags/v1.13.8.tar.gz \
+            sherpa-onnx-1.13.8.tar.gz ""
+          sha256sum espeak-ng-*.zip piper-phonemize-*.zip sherpa-onnx-*.tar.gz > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Publish them as this tag's release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # A manual run publishes under this sherpa-onnx version's tag too.
+          TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'gpl-sources-1.13.8' }}
+        run: |
+          set -euo pipefail
+          cat > notes.md <<'NOTES'
+          The complete corresponding source of the GPL-3.0 parts compiled into QVoice's app (GPL-3.0 §6), kept here so it stays available for as long as QVoice is distributed:
+
+          - **eSpeak NG** (GPL-3.0-or-later), as built by sherpa-onnx 1.13.8 into `libsherpa-onnx-jni.so`
+          - **piper-phonemize** (MIT), as built by sherpa-onnx 1.13.8
+          - **sherpa-onnx v1.13.8** (Apache-2.0), whose build scripts produce that library
+
+          QVoice's own source is this repository, at the commit of each release. Details: NOTICE.md. Checksums: SHA256SUMS.
+          NOTES
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+              espeak-ng-*.zip piper-phonemize-*.zip sherpa-onnx-*.tar.gz SHA256SUMS
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "Sources of the GPL components (sherpa-onnx 1.13.8)" --notes-file notes.md \
+              espeak-ng-*.zip piper-phonemize-*.zip sherpa-onnx-*.tar.gz SHA256SUMS
+          fi

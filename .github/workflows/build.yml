@@ -69,11 +69,9 @@ jobs:
       - name: Release build check (R8, lint)
         run: gradle assembleRelease
 
-      # Reported, not yet enforced: lint has never run on this code before
-      # (the sandbox can't run it). Once a run comes back clean, this step
-      # loses continue-on-error and becomes a gate like the others.
+      # A gate like the others since its first run came back without errors
+      # (slice 20). Warnings don't fail it; errors do.
       - name: Lint
-        continue-on-error: true
         run: gradle lintDebug
 
       - name: Upload the debug APK

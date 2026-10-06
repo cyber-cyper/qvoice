@@ -42,10 +42,11 @@ complete corresponding source is:
   (SHA256 `d9cca4e2bdc7d6dd8dffb96a4668283dbd3f77a9c194a3e530c1e8eba9406a5d`).
 
 GPL-3.0 requires that this source stay available for as long as the binary is
-distributed. Before the first public release, mirror the two archives above
-and the sherpa-onnx source tarball into the QVoice repository's release
-assets, so availability doesn't depend on third-party hosting (tracked in
-docs/BACKLOG.md).
+distributed, so the three archives are mirrored, checked against the hashes
+above, into this repository's release **gpl-sources-1.13.8**:
+https://github.com/cyber-cyper/qvoice/releases/tag/gpl-sources-1.13.8
+(made by `.github/workflows/gpl-sources.yml`; a new sherpa-onnx version gets
+a new tag the same way).
 
 ## The built-in voice
 

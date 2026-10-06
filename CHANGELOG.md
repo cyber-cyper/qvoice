@@ -24,6 +24,14 @@ raise it; debug builds show the slice after the version ("1.0.0-slice20").
   see.
 - The release guide tests the Play-signed build on your own phone through
   Play's internal testing (available in minutes) before the closed test.
+- **The source is public** at https://github.com/cyber-cyper/qvoice, and
+  every push is built there with the real Android tools. The first run was
+  green throughout: unit tests, the debug APK, the R8-shrunk release build
+  and lint, which is now a gate (errors fail the build).
+- **The GPL components' sources** (eSpeak NG, piper-phonemize, sherpa-onnx
+  1.13.8) are mirrored into the repository's release `gpl-sources-1.13.8`
+  by a workflow that checks them against the hashes sherpa-onnx pins, as
+  GPL-3.0 asks for as long as the app is distributed (NOTICE.md).
 
 ## 1.0.0 — slice 19: read copied text — 2026-10-05 (versionCode 1)
 

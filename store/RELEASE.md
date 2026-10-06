@@ -7,7 +7,7 @@ if a button is named a little differently, the order still holds.
 
 | Step | Who | Time |
 |---|---|---|
-| 1. Publish the source (GPL) | you install the Claude GitHub App once, I push | 5 minutes |
+| 1. Publish the source (GPL) | done: github.com/cyber-cyper/qvoice | — |
 | 2. Upload key and signed bundle | you, in Android Studio | 10 minutes |
 | 3. Play Console: the app, its listing, the forms | you | 1 hour |
 | 4. Internal test: the Play build on your phone | you | 30 minutes |
@@ -20,27 +20,20 @@ upload. Play refuses a second upload with the same versionCode, so a fixed
 or improved build during the test needs versionCode 2 (then 3…): tell me
 and I raise it.
 
-## 1. Publish the source
+## 1. Publish the source (done)
 
 The app contains eSpeak NG (GPL-3.0), so the source of every build on Play
 must be public, and release builds refuse to run until `qvoice.sourceUrl`
-names it (`app/build.gradle.kts`). The repository exists
-(https://github.com/cyber-cyper/qvoice) and `qvoice.sourceUrl` points at it.
+names it (`app/build.gradle.kts`). Done in slice 20: the source is at
+https://github.com/cyber-cyper/qvoice (`qvoice.sourceUrl`), GitHub builds and
+tests every push, the GPL components' sources are in its release
+`gpl-sources-1.13.8`, and the commit of each Play build gets a tag
+(`v1.0.0-build1` for versionCode 1). I push every slice there; you keep
+extracting zips as usual.
 
-**Recommended: let me push.**
-
-1. On claude.ai: **Settings → Connectors → GitHub**, connect it, signed in
-   as `cyber-cyper` (done).
-2. Install the Claude GitHub App on the account:
-   https://github.com/apps/claude/installations/select_target → choose
-   **cyber-cyper** → **Only select repositories** → **qvoice** →
-   **Install**.
-3. Tell me "installed".
-
-I then push the source exactly as in the latest zip, check that GitHub's
-build passes, and attach the GPL source archives (eSpeak NG,
-piper-phonemize, sherpa-onnx 1.13.8) to a release. You keep extracting
-zips as usual.
+If GitHub ever refuses Claude's pushes, the Claude GitHub App needs
+access: https://github.com/apps/claude/installations/select_target →
+**cyber-cyper** → **Only select repositories** → **qvoice** → **Install**.
 
 **Or yourself, with GitHub Desktop** (no command line). Do this in a fresh
 copy of the latest zip, not in the folder you build in: unpacking zips over
@@ -184,7 +177,7 @@ lost.
 
 ## What I need from you for this
 
-1. "installed" (step 1), or a word that you'll publish the source yourself.
-2. The privacy policy page uploaded (above).
+1. The privacy policy page uploaded (above).
+2. A word when the bundle is uploaded (which zip it was built from).
 3. Whether the Riniso developer account was created before or after
    13 November 2023 (after: the closed test in step 5 is required).

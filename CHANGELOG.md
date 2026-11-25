@@ -5,6 +5,19 @@ with the versionName's last number (D-037). versionCode 1 (1.0.0) was the
 first upload, to closed testing on 6 October 2026, built from slice 20.
 Debug builds show the slice after the version ("1.0.1-slice24").
 
+## Integration handover for the Riniso apps — 2026-11-25 (no app change)
+
+- `integration/`: everything LifeCue, QTune: Quote Ringtones and QTune:
+  Tamil Wisdom need to use QVoice's voices: QVoice's engine contract, the
+  integration guide, a brief per app, the prompt for each app's chat, the
+  handover template they fill in, a test and release checklist, and
+  **RinisoSpeech** (`com.riniso.speech`, Apache-2.0), the shared helper:
+  QVoice for every language it has a voice for, the phone's engine for the
+  rest (Tamil), automatic fallback, voice by gender or name, fast start and
+  a start timeout for alarms, rendering to files, no overlapping speech
+  across the two engines. Compiles against API 35 with warnings as errors;
+  8 unit tests.
+
 ## 1.0.1 — slice 24: sentence by sentence — 2026-10-06 (versionCode 2)
 
 - **The reader follows the voice sentence by sentence:** the sentence being

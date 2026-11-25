@@ -176,8 +176,13 @@ next to the zips and played from the voice library.
 - **A "What's new" pop-up or an onboarding carousel.** The setup card is
   the whole first-run guide; Play's release notes say what's new.
 
-**Deferred by the owner:** the helper for the Riniso apps ("finalise QVoice
-first"); Indian-language voices (left to Google's engine for now).
+**Deferred by the owner:** Indian-language voices (left to Google's engine for now).
+
+**Integration of the Riniso apps (started 25 Nov 2026):** `integration/` holds
+the handover for LifeCue, QTune: Quote Ringtones and QTune: Tamil Wisdom and
+the canonical copy of the shared helper RinisoSpeech (Apache-2.0, two Kotlin
+files). Each app's chat integrates it; changes to the helper are made here
+first and copied out.
 
 ### After the first release
 

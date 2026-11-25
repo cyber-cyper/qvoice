@@ -11,9 +11,19 @@ The app keeps speaking through Android's TextToSpeech API, but through
 - if QVoice refuses or is too slow, the same request is repeated on the
   phone's engine.
 
-The user gets one setting, "Voice engine": **Automatic** (the default) or
-**Phone's default voice**. Optionally there is also a voice (gender or a
-named voice) for each language the app speaks.
+The user gets **one choice** (the pattern LifeCue settled on; use it in every
+app):
+- **Automatic (recommended, the default):** QVoice where it has the
+  language, the phone's voice for the rest. With QVoice installed, the user
+  can also pick Any, Female or Male.
+- **Your phone's voice:** never QVoice.
+- **A voice you choose:** one list with QVoice's voices (by name, marked
+  female or male, and quick or slow to start) and the phone's voices.
+
+A chosen voice is stored as a `VoiceRef` string (`qvoice:<name>` or
+`system:<name>`) in the field the app already keeps a voice name in. A bare
+old name still reads as a phone voice, so no database or backup change is
+needed.
 
 ## Step by step
 
@@ -50,8 +60,11 @@ named voice) for each language the app speaks.
        text = quote.text,
        locale = if (quote.isTamil) Locale.forLanguageTag("ta-IN") else Locale.forLanguageTag("en-IN"),
        gender = settings.voiceGender,                   // VoiceGender.ANY / FEMALE / MALE
+       voice = VoiceRef.parse(settings.voiceName),      // a voice the user chose, or null
        callback = object : RinisoSpeech.Callback {
            override fun onDone(id: String, engine: SpeechRouting.Engine) { /* next quote */ }
+           override fun onRange(id: String, start: Int, end: Int, engine: SpeechRouting.Engine) { /* follow the words */ }
+           override fun onFallback(id: String, reason: FallbackReason) { /* the app's own log */ }
            override fun onError(id: String) { /* show "couldn't speak" */ }
        },
    ))
@@ -63,16 +76,23 @@ named voice) for each language the app speaks.
    About locales: QVoice's English voices are en-US and en-GB.
    `Locale("en", "IN")` still gets them, because the language matches and
    the region only ranks voices. Keep using the app's own locale.
-4. **Settings: one setting, maybe two.** These go in the app's existing
-   voice or speech settings:
-   - **Voice engine:** *Automatic: QVoice when installed, else the phone's
-     voice* / *Phone's default voice*. Store it as `EngineChoice.name`.
-   - **Voice** (optional, per language the app speaks):
-     `speech.voices(locale) { engine, options -> }` lists name, label and
-     gender. Store the name and pass it as `voiceName`. Or offer just
-     "Female / Male / Any" (`gender`), which needs no list.
+4. **Settings: the one choice above.** It goes in the app's existing voice
+   settings:
+   - Automatic → `EngineChoice.AUTOMATIC` plus `gender`;
+   - Your phone's voice → `EngineChoice.SYSTEM`;
+   - A voice you choose → `voice`.
+
+   `speech.voices(null) { options -> }` lists every installed voice of both
+   engines in every language (QVoice's first). Each one has `ref`, `label`,
+   `locale`, `gender` and `fast`. Store `ref.toString()`.
+   `speech.voices(locale)` narrows the list to one language. Per-item
+   choices (a voice per alarm, per ringtone set) use the same list and the
+   same string.
    - A **"Get natural offline voices" card**, shown only when QVoice isn't
-     installed. Use QVoice's icon (`assets/`), one line ("Free, offline,
+     installed. Its link carries the app's name for Play's install
+     statistics: `QVoice.openPlayListing(context, source = "lifecue")`
+     (Play Console → Acquisition → Tracked channels (UTM)). It contains
+     nothing about the user. Use QVoice's icon (`assets/`), one line ("Free, offline,
      no ads: QVoice adds natural English voices"), a **Get QVoice** button
      (`QVoice.openPlayListing`) and a **Dismiss** button that is remembered.
      When QVoice is installed, show **More voices** instead
@@ -83,6 +103,22 @@ named voice) for each language the app speaks.
 6. **Tests.** Copy `SpeechRoutingTest.kt` and add a test for any routing
    the app adds itself (e.g. which locale a quote gets). Then run the
    device checks in `06-TEST-AND-RELEASE-CHECKLIST.md`.
+
+## Text in any language (cues users write themselves)
+
+1. **Find its language.** Use what the user set for the item, else
+   `ScriptLanguage.guess(text)` per sentence (Tamil, Malayalam, Thai,
+   Japanese… are certain from the script), else the app's or the phone's
+   language. Latin, Cyrillic, Arabic and Devanagari script need that
+   fallback: one script, several languages.
+2. **Check before it matters:** when the user saves the item,
+   `speech.canSpeak(locale) { qvoice, system -> }`. If neither engine has
+   the language, say so right there: "No voice for Swahili on this phone.
+   **Get one**". The button calls
+   `QVoice.openVoiceLibrary(context, locale)` when QVoice is installed
+   (QVoice opens on that language's voices once it supports
+   `EXTRA_LANGUAGE`), else Android's own "install voice data". Never
+   discover a missing voice at 6 a.m.
 
 ## UX rules (best practice for an optional companion app)
 

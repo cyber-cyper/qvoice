@@ -5,6 +5,20 @@ with the versionName's last number (D-037). versionCode 1 (1.0.0) was the
 first upload, to closed testing on 6 October 2026, built from slice 20.
 Debug builds show the slice after the version ("1.0.1-slice24").
 
+## RinisoSpeech 1.1.0 and the language roadmap — 2026-11-26 (no app change)
+
+- From LifeCue's review: voices tied to their engine (`VoiceRef`, stored as
+  `qvoice:`/`system:` in the existing field), voice lists across languages
+  and engines, ranges passed on, fallback reasons, detection of Android
+  silently binding another engine (and a retry after a minute), the API 33
+  package lookup, UTM-tagged Play links, `ScriptLanguage.guess` and
+  `canSpeak` for cues in any language, and the library-by-language extra.
+  13 unit tests.
+- `integration/07-ROADMAP.md`: QVoice phases Q1–Q6 (helpers for the apps,
+  an online catalogue, fast Piper voices for Hindi, Malayalam, Telugu and
+  Nepali, then about 35 more languages, listing translations, a Tamil voice
+  of our own) and the apps' phases A1–A6.
+
 ## Integration handover for the Riniso apps — 2026-11-25 (no app change)
 
 - `integration/`: everything LifeCue, QTune: Quote Ringtones and QTune:

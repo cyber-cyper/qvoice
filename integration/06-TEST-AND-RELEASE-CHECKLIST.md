@@ -23,7 +23,8 @@ $adb = "C:\Users\Public\sdk\platform-tools\adb.exe"
 2. **Install QVoice from Play** using the card's **Get QVoice** button,
    then come back. The card now says **More voices**, and English speech
    uses QVoice (its voice sounds different from Google's).
-3. **Voice engine → Phone's default voice:** QVoice is never used.
+3. **Your phone's voice:** QVoice is never used. **A voice you choose**
+   (a Google voice) stays that voice in every mode.
 4. **Gender:** Female and Male give QVoice's female and male voices.
 5. **Cold start:** force-stop QVoice, then speak. The first words come
    within about a second with the built-in voice.

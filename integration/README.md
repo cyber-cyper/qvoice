@@ -1,7 +1,8 @@
 # QVoice integration handover (Riniso apps)
 
 Prepared 25 November 2026 from the QVoice project (repository state: version
-1.0.1, versionCode 2, slice 24). This zip contains everything an app's chat
+1.0.1, versionCode 2, slice 24). **Updated 26 November 2026: RinisoSpeech
+1.1.0**, after LifeCue's review (see `08-LIFECUE-REPLY.md`). This zip contains everything an app's chat
 needs to add QVoice's voices to that app, plus a template for the handover
 that chat sends back.
 
@@ -41,8 +42,10 @@ that chat sends back.
 | `04-PROMPT-FOR-APP-CHAT.md` | The text to paste into each app's chat. |
 | `05-HANDOVER-BACK-TEMPLATE.md` | What each app's chat writes about its app. |
 | `06-TEST-AND-RELEASE-CHECKLIST.md` | Device tests and release steps, the same for every app. |
+| `07-ROADMAP.md` | Where QVoice goes next (global languages) and the phases for the apps. |
+| `08-LIFECUE-REPLY.md` | What changed in 1.1.0, and answers to LifeCue's questions. |
 | `code/com/riniso/speech/` | **RinisoSpeech**: the shared helper, two Kotlin files. It is copied unchanged into every app and compiled against Android 35 with warnings as errors. |
-| `code/test/com/riniso/speech/` | Its unit tests (8, all passing). |
+| `code/test/com/riniso/speech/` | Its unit tests (13, all passing). |
 | `assets/qvoice-icon-512.png` | QVoice's icon, for the optional "Get QVoice" card. |
 
 ## Decisions already made (and why)
@@ -69,11 +72,11 @@ that chat sends back.
 
 - `RinisoSpeech.kt` and `SpeechRouting.kt` compile against the Android 15
   (API 35) SDK with Kotlin 2.2 and warnings as errors.
-- The routing rules have 8 unit tests, all passing:
+- The rules have 13 unit tests, all passing:
   - which engine speaks;
   - which voice is chosen;
   - gender, region and fast start;
-  - labels.
+  - labels, voice references and script detection.
 - **Not yet run on a phone:** the Android side, i.e. engine start-up, the
   fallback to the phone's engine, and keeping two engines from talking at
   once. The first app's device tests (LifeCue,

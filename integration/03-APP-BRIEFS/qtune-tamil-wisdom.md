@@ -29,11 +29,12 @@ never reused, no READ_CALL_LOG, all ringtone paths end in
    QTune: Quote Ringtones (see that brief): read the WAV header, keep
    `finalizeRingtoneFile()`.
 4. **Settings:**
-   - Voice engine (Automatic / Phone's default voice).
+   - The one voice choice (Automatic / Your phone's voice / A voice you
+     choose), as in the guide.
    - The English voice: gender or a named voice.
    - The Tamil voice stays as the app has it today.
    - The "Get QVoice" card should say "for English quotes", so nobody
-     expects Tamil from it.
+     expects Tamil from it (`source = "qtune_tamil"`).
 5. **Tamil voice check:** keep (or add) the app's existing check that the
    phone's engine has Tamil, and its prompt to install Google's Tamil voice
    data. QVoice changes nothing there.

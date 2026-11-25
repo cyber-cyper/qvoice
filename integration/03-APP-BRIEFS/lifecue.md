@@ -23,8 +23,15 @@ voices are a clear step up and start just as fast.
    engine says it instead.
 4. Keep the alarm's own ringtone/vibration logic exactly as it is. Speech is
    added on top: if both fail, the alarm still rings.
-5. Settings: Voice engine (Automatic / Phone's default voice), the voice
-   gender, the "Get QVoice" card, and "Hear a sample".
+5. Settings: the one voice choice in Me › Voice (Automatic / Your phone's
+   voice / A voice you choose), a voice per alarm in the editor's Advanced
+   section, the card with `source = "lifecue"`, and "Hear a sample" saying
+   who spoke. This is LifeCue's own plan (26 Nov), adopted for all apps.
+6. Cues users write in any language: the guide's "Text in any language".
+7. Later (LifeCue's Chunk B, BL-035): render the next ring's words to a WAV
+   file in device-protected storage, ahead of time, and play that at ring
+   time. It works before the first unlock after a restart, and lets
+   QVoice's slow, best voices wake the user.
 
 ## Watch out
 

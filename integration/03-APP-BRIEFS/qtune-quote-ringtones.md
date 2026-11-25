@@ -23,10 +23,12 @@ live speech.
    the app's ringtone pipeline for a hard-coded rate. That is the most
    likely bug.
 4. **Voice choice for ringtones:** offer the voice list
-   (`speech.voices(Locale.US)`) with labels and gender. Store the chosen
-   name per ringtone set, so re-rendering later gives the same voice. If
+   (`speech.voices(Locale.ENGLISH) { options -> }`) with labels, gender and
+   speed. Store `ref.toString()` per ringtone set, so re-rendering later
+   gives the same voice. If
    the stored voice was deleted, the helper uses the engine's default.
-5. Settings: Voice engine, the "Get QVoice" card, and "More voices" (opens
+5. Settings: the one voice choice (as in the guide), the "Get QVoice" card
+   (`source = "qtune_quotes"`), and "More voices" (opens
    QVoice's library to download Kokoro and the others).
 6. **Live preview:** the same RinisoSpeech, `USAGE_MEDIA`.
 

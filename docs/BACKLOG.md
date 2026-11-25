@@ -184,6 +184,13 @@ the canonical copy of the shared helper RinisoSpeech (Apache-2.0, two Kotlin
 files). Each app's chat integrates it; changes to the helper are made here
 first and copied out.
 
+**Next for QVoice (integration/07-ROADMAP.md):** Q1 open the library on one
+language (`com.riniso.qvoice.extra.LANGUAGE`) and report chunks as
+`onRangeStart`; Q2 the catalogue online, grouped by language; Q3 fast Piper
+voices for Hindi, Malayalam, Telugu, Nepali (owner's decision); Q4 fast
+voices for the most-spoken languages; Q5 listing translations for them; Q6
+a Tamil voice of our own (owner's decision).
+
 ### After the first release
 
 - **Per-app voices** (Marmalade-style routing by calling app) and voice

@@ -10,17 +10,25 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import java.io.File
 import java.util.Locale
 
-/** This file's version; the same in every app that carries it. */
-const val RINISO_SPEECH_VERSION = "1.0.0"
+/**
+ * This file's version; the same in every app that carries it.
+ * 1.1.0 (26 Nov 2026, from LifeCue's handover): voices tied to their engine
+ * (VoiceRef), voice lists across languages and engines, word/sentence ranges
+ * passed on, fallback reasons, detection of Android silently binding another
+ * engine, the API 33 package lookup, UTM-tagged Play links, ScriptLanguage.
+ */
+const val RINISO_SPEECH_VERSION = "1.1.0"
 
 /**
  * QVoice (com.riniso.qvoice): Riniso's offline text-to-speech engine. Its
@@ -42,24 +50,54 @@ object QVoice {
 
     /** Installed and enabled (needs the <queries> entry above). */
     fun isInstalled(context: Context): Boolean = try {
-        context.packageManager.getApplicationInfo(PACKAGE, 0).enabled
+        val pm = context.packageManager
+        val info = if (Build.VERSION.SDK_INT >= 33) {
+            pm.getApplicationInfo(PACKAGE, PackageManager.ApplicationInfoFlags.of(0))
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getApplicationInfo(PACKAGE, 0)
+        }
+        info.enabled
     } catch (e: PackageManager.NameNotFoundException) {
         false
     }
 
-    /** QVoice's Play page: in the Play Store app if there is one, else the browser. */
-    fun openPlayListing(context: Context) {
-        val view = Intent(Intent.ACTION_VIEW, Uri.parse(PLAY_URL)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    /**
+     * QVoice's Play page with a campaign tag: [source] is the app ("lifecue",
+     * "qtune"...), [campaign] where in it ("voice_card"). Play Console counts
+     * the installs under Acquisition → Tracked channels (UTM). The tag carries
+     * nothing about the user.
+     */
+    fun playUrl(source: String? = null, campaign: String = "voice_card"): String {
+        if (source == null) return PLAY_URL
+        val referrer = "utm_source=$source&utm_medium=app&utm_campaign=$campaign"
+        return PLAY_URL + "&referrer=" + Uri.encode(referrer)
+    }
+
+    /** QVoice's Play page ([playUrl]): in the Play Store app if there is one, else the browser. */
+    fun openPlayListing(context: Context, source: String? = null, campaign: String = "voice_card") {
+        val view = Intent(Intent.ACTION_VIEW, Uri.parse(playUrl(source, campaign))).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (start(context, Intent(view).setPackage(PLAY_STORE))) return
         start(context, view)
     }
 
     /**
-     * QVoice's voice library (Android's standard "install voice data" action,
-     * which QVoice answers), to download a voice; false if QVoice isn't there.
+     * Extra for [openVoiceLibrary]: the BCP-47 language the user needs a voice
+     * for ("sw", "ml-IN"). QVoice versions that know it open the library on
+     * that language's voices; older ones ignore it and show the whole list.
      */
-    fun openVoiceLibrary(context: Context): Boolean =
-        start(context, Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).setPackage(PACKAGE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    const val EXTRA_LANGUAGE = "com.riniso.qvoice.extra.LANGUAGE"
+
+    /**
+     * QVoice's voice library (Android's standard "install voice data" action,
+     * which QVoice answers), to download a voice, for [locale]'s language if
+     * given; false if QVoice isn't there.
+     */
+    fun openVoiceLibrary(context: Context, locale: Locale? = null): Boolean {
+        val intent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).setPackage(PACKAGE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        locale?.let { intent.putExtra(EXTRA_LANGUAGE, it.toLanguageTag()) }
+        return start(context, intent)
+    }
 
     /** QVoice's home screen (voices, speeds, setting it as the phone's engine). */
     fun openApp(context: Context): Boolean {
@@ -84,12 +122,17 @@ object QVoice {
  *   user's [EngineChoice] allows) and the phone's default.
  * - Every request names its language. QVoice is asked first when it has a
  *   voice for it (SpeechRouting.engineFor); if QVoice refuses the text (a
- *   script it can't read, a voice deleted meanwhile, QVoice not starting
- *   within [initTimeoutMs]) the same request is repeated on the system
- *   engine, once. So adding QVoice can never make an app go silent.
- * - Optional: a voice gender, a voice the user picked by name, "fast start"
- *   for alarms (a fast voice, and a fallback when the first sound takes
- *   longer than [Request.startTimeoutMs]).
+ *   script it can't read, a voice deleted meanwhile), doesn't start within
+ *   [initTimeoutMs], or turns out to be another engine (Android binds the
+ *   default engine instead, silently), the same request is repeated on the
+ *   system engine, once, and [Callback.onFallback] says why. So adding QVoice
+ *   can never make an app go silent.
+ * - A voice the user chose ([Request.voice], a [VoiceRef]) names its engine,
+ *   so a Google voice stays a Google voice even in Automatic.
+ * - Optional: a voice gender, "fast start" for alarms (a fast voice, and a
+ *   fallback when the first sound takes longer than [Request.startTimeoutMs]).
+ * - Requests on the two engines never talk over each other: one waits until
+ *   the other engine has finished.
  * - Callbacks arrive on the main thread.
  *
  * One instance per app (in its Application or DI graph) or per service; call
@@ -104,29 +147,47 @@ class RinisoSpeech(
     /** How long QVoice may take to start before a request goes to the system engine. */
     private val initTimeoutMs: Long = 4_000L,
 ) {
+    private companion object {
+        const val RETRY_AFTER_MS = 60_000L
+    }
+
     private val app = context.applicationContext
     private val main = Handler(Looper.getMainLooper())
 
     /** What happened to a request. [engine]: who spoke (or tried last). */
     interface Callback {
         fun onStart(id: String, engine: SpeechRouting.Engine) {}
+
+        /**
+         * The engine is about to speak characters [start] until [end] of the
+         * request's text. Google's engine reports words; QVoice reports nothing
+         * yet (planned: its chunks), so keep onStart-based progress as the
+         * baseline and treat ranges as a refinement.
+         */
+        fun onRange(id: String, start: Int, end: Int, engine: SpeechRouting.Engine) {}
+
         fun onDone(id: String, engine: SpeechRouting.Engine) {}
+
+        /** Meant for QVoice, spoken by the system engine instead; for an app's own logs. */
+        fun onFallback(id: String, reason: FallbackReason) {}
+
         /** Neither engine could speak it. */
         fun onError(id: String) {}
     }
 
     /**
-     * One thing to say. [locale]: its language (the app knows it: a Tamil
-     * quote is Locale("ta", "IN"), ...). [file]: synthesise into this WAV
-     * file instead of speaking (ringtones). [flush]: drop whatever is queued.
+     * One thing to say. [locale]: its language (the app knows it, or
+     * ScriptLanguage.guess finds it for text users wrote). [file]: synthesise
+     * into this WAV file instead of speaking (ringtones, alarms made ahead).
+     * [flush]: drop whatever is queued.
      */
     class Request(
         val id: String,
         val text: CharSequence,
         val locale: Locale,
         val gender: VoiceGender = VoiceGender.ANY,
-        /** A voice name the user picked in the app's settings (from [voices]); null: the engine's choice. */
-        val voiceName: String? = null,
+        /** A voice the user chose ([VoiceRef], as stored); null: the engine's choice. */
+        val voice: VoiceRef? = null,
         /** Alarms and reminders: prefer a voice that starts at once. */
         val fastStart: Boolean = false,
         /** With QVoice: no first sound within this time -> the system engine says it. Null: wait. */
@@ -139,14 +200,31 @@ class RinisoSpeech(
         val callback: Callback? = null,
     )
 
+    /** A voice for a settings list. Store [ref] (its toString()) and pass it back as [Request.voice]. */
+    class VoiceOption(
+        val ref: VoiceRef,
+        val label: String,
+        val locale: Locale,
+        val gender: VoiceGender,
+        /** Starts at once; false for QVoice's large voices (Kokoro, Supertonic). */
+        val fast: Boolean,
+    ) {
+        val engine: SpeechRouting.Engine get() = ref.engine
+    }
+
     private inner class Engine(val kind: SpeechRouting.Engine) {
         var tts: TextToSpeech? = null
         var ready = false
         var failed = false
+        var failure: FallbackReason? = null
+        private var failedAt = 0L
         val waiting = ArrayList<(TextToSpeech?) -> Unit>()
 
         /** Runs [action] with the started engine, or with null if it failed or (QVoice) is too slow. */
         fun use(action: (TextToSpeech?) -> Unit) {
+            // A failed start is tried again after a minute (QVoice updated,
+            // re-enabled, or the phone unlocked after a restart), not forever.
+            if (failed && SystemClock.elapsedRealtime() - failedAt > RETRY_AFTER_MS) shutdown()
             if (failed) return action(null)
             if (ready) return action(tts)
             waiting += action
@@ -156,8 +234,16 @@ class RinisoSpeech(
         private fun start() {
             val listener = TextToSpeech.OnInitListener { status ->
                 main.post {
-                    if (status == TextToSpeech.SUCCESS) ready = true else failed = true
-                    flush()
+                    val engine = tts ?: return@post // shut down meanwhile
+                    when {
+                        status != TextToSpeech.SUCCESS -> fail(FallbackReason.QVOICE_FAILED_TO_START)
+                        // Android binds the default engine when the requested one
+                        // can't start, and still reports SUCCESS: check it's QVoice.
+                        kind == SpeechRouting.Engine.QVOICE && !SpeechRouting.isQVoice(safeVoices(engine)) ->
+                            fail(FallbackReason.QVOICE_REPLACED_BY_ANDROID)
+                        else -> ready = true
+                    }
+                    flushWith(if (ready) tts else null)
                 }
             }
             tts = if (kind == SpeechRouting.Engine.QVOICE) TextToSpeech(app, listener, QVoice.PACKAGE) else TextToSpeech(app, listener)
@@ -171,7 +257,12 @@ class RinisoSpeech(
             }
         }
 
-        private fun flush() = flushWith(if (ready) tts else null)
+        private fun fail(reason: FallbackReason) {
+            failed = true
+            failure = reason
+            failedAt = SystemClock.elapsedRealtime()
+            tts?.shutdown()
+        }
 
         private fun flushWith(engine: TextToSpeech?) {
             val now = ArrayList(waiting)
@@ -184,12 +275,15 @@ class RinisoSpeech(
             tts = null
             ready = false
             failed = false
+            failure = null
             waiting.clear()
         }
     }
 
     private val qvoice = Engine(SpeechRouting.Engine.QVOICE)
     private val system = Engine(SpeechRouting.Engine.SYSTEM)
+
+    private fun engineOf(kind: SpeechRouting.Engine) = if (kind == SpeechRouting.Engine.QVOICE) qvoice else system
 
     /** A request on its way: which engine has it, under which internal id. */
     private class Pending(val request: Request, val engine: SpeechRouting.Engine, val seq: Int, var started: Boolean = false)
@@ -216,21 +310,28 @@ class RinisoSpeech(
     fun speak(request: Request) {
         if (request.flush) stop()
         val installed = QVoice.isInstalled(app)
-        val wanted = SpeechRouting.engineFor(choice(), installed, qvoiceHasLanguage = null)
+        val pinned = request.voice?.engine
+        val wanted = SpeechRouting.engineFor(choice(), installed, qvoiceHasLanguage = null, pinned = pinned)
         if (wanted == SpeechRouting.Engine.SYSTEM) return send(request, system)
         val sentIn = generation
         qvoice.use { tts ->
             if (sentIn != generation) return@use
-            val has = tts?.let { hasLanguage(it, request.locale) }
-            val engine = SpeechRouting.engineFor(choice(), installed, has)
-            send(request, if (tts != null && engine == SpeechRouting.Engine.QVOICE) qvoice else system)
+            if (tts == null) {
+                qvoice.failure?.let { request.callback?.onFallback(request.id, it) }
+                    ?: request.callback?.onFallback(request.id, FallbackReason.QVOICE_SLOW_TO_START)
+                return@use send(request, system)
+            }
+            // A chosen QVoice voice is spoken whatever the language; otherwise
+            // only languages QVoice has.
+            val has = if (pinned == SpeechRouting.Engine.QVOICE) true else hasLanguage(tts, request.locale)
+            val engine = SpeechRouting.engineFor(choice(), installed, has, pinned)
+            send(request, engineOf(engine))
         }
     }
 
     /** Starts the engines a [locale] needs now, so the first word later comes at once (alarms: call when the alarm fires, before building the text). */
     fun warmUp(locale: Locale) {
-        // setLanguage makes an engine load that language's voice; QVoice also
-        // computes nothing yet, it only gets the model ready.
+        // setLanguage makes an engine load that language's voice.
         system.use { tts -> tts?.setLanguage(locale) }
         if (SpeechRouting.engineFor(choice(), QVoice.isInstalled(app), null) == SpeechRouting.Engine.QVOICE) {
             qvoice.use { tts -> if (tts != null && hasLanguage(tts, locale)) tts.setLanguage(locale) }
@@ -238,27 +339,50 @@ class RinisoSpeech(
     }
 
     /**
-     * The voices for [locale] a settings screen can offer, from the engine
-     * that would speak that language: name (store it, pass it back as
-     * [Request.voiceName]), a label and the gender if known.
+     * The voices a settings screen can offer: the phone engine's and, when
+     * QVoice is installed, QVoice's, for [locale]'s language or (null) every
+     * language. Installed, offline voices only; QVoice's first. Whatever the
+     * user's EngineChoice: the list is where they choose.
      */
-    fun voices(locale: Locale, onResult: (engine: SpeechRouting.Engine, voices: List<VoiceOption>) -> Unit) {
-        fun from(engine: SpeechRouting.Engine, tts: TextToSpeech?) {
-            val list = tts?.let { safeVoices(it) }.orEmpty()
-                .filter { it.language.equals(locale.language, ignoreCase = true) && !it.requiresNetwork && !it.notInstalled }
-                .map { VoiceOption(it.name, SpeechRouting.labelOf(it.name), SpeechRouting.genderOf(it)) }
-            onResult(engine, list)
-        }
-        if (SpeechRouting.engineFor(choice(), QVoice.isInstalled(app), null) == SpeechRouting.Engine.SYSTEM) {
-            return system.use { from(SpeechRouting.Engine.SYSTEM, it) }
-        }
-        qvoice.use { tts ->
-            if (tts != null && hasLanguage(tts, locale)) from(SpeechRouting.Engine.QVOICE, tts)
-            else system.use { from(SpeechRouting.Engine.SYSTEM, it) }
+    fun voices(locale: Locale?, onResult: (List<VoiceOption>) -> Unit) {
+        fun options(kind: SpeechRouting.Engine, tts: TextToSpeech?): List<VoiceOption> = tts?.let { engine ->
+            val raw = try { engine.voices.orEmpty() } catch (e: Exception) { emptySet<Voice>() }
+            raw.filter { v ->
+                val info = v.toInfo()
+                !info.requiresNetwork && !info.notInstalled &&
+                    (locale == null || info.language.equals(locale.language, ignoreCase = true))
+            }.map { v ->
+                val info = v.toInfo()
+                VoiceOption(
+                    ref = VoiceRef(kind, v.name),
+                    label = if (kind == SpeechRouting.Engine.QVOICE) SpeechRouting.labelOf(v.name) else v.name,
+                    locale = v.locale,
+                    gender = SpeechRouting.genderOf(info),
+                    fast = SpeechRouting.isFast(info),
+                )
+            }.sortedWith(compareBy({ it.locale.toLanguageTag() }, { it.label }))
+        }.orEmpty()
+
+        system.use { sys ->
+            val systemList = options(SpeechRouting.Engine.SYSTEM, sys)
+            if (!QVoice.isInstalled(app)) return@use onResult(systemList)
+            qvoice.use { qv -> onResult(options(SpeechRouting.Engine.QVOICE, qv) + systemList) }
         }
     }
 
-    class VoiceOption(val name: String, val label: String, val gender: VoiceGender)
+    /**
+     * Which engines have a voice for [locale]'s language, for text users
+     * write in any language (a cue in Swahili): when neither has, the app can
+     * say so and offer QVoice.openVoiceLibrary(context, locale) (or Android's
+     * own "install voice data") instead of failing silently at alarm time.
+     */
+    fun canSpeak(locale: Locale, onResult: (qvoice: Boolean, system: Boolean) -> Unit) {
+        system.use { sys ->
+            val onSystem = sys?.let { hasLanguage(it, locale) } ?: false
+            if (!QVoice.isInstalled(app)) return@use onResult(false, onSystem)
+            qvoice.use { qv -> onResult(qv?.let { hasLanguage(it, locale) } ?: false, onSystem) }
+        }
+    }
 
     /** Stops everything being said or queued, on both engines. */
     fun stop() {
@@ -273,6 +397,7 @@ class RinisoSpeech(
     fun shutdown() {
         pending.clear()
         held.clear()
+        generation++
         main.removeCallbacksAndMessages(null)
         qvoice.shutdown()
         system.shutdown()
@@ -299,7 +424,10 @@ class RinisoSpeech(
             if (tts == null) {
                 // QVoice failed or is too slow: the system engine. The system
                 // engine failing too: report it.
-                if (engine.kind == SpeechRouting.Engine.QVOICE) return@use dispatch(request, system)
+                if (engine.kind == SpeechRouting.Engine.QVOICE) {
+                    request.callback?.onFallback(request.id, engine.failure ?: FallbackReason.QVOICE_SLOW_TO_START)
+                    return@use dispatch(request, system)
+                }
                 request.callback?.onError(request.id)
                 return@use releaseHeld()
             }
@@ -311,9 +439,12 @@ class RinisoSpeech(
             } else {
                 tts.speak(request.text, TextToSpeech.QUEUE_ADD, Bundle(), key)
             }
-            if (result != TextToSpeech.SUCCESS) failed(key)
-            else if (engine.kind == SpeechRouting.Engine.QVOICE && request.file == null) {
-                request.startTimeoutMs?.let { ms -> main.postDelayed({ if (pending[key]?.started == false) failed(key, stopEngine = true) }, ms) }
+            if (result != TextToSpeech.SUCCESS) {
+                failed(key, FallbackReason.QVOICE_REFUSED)
+            } else if (engine.kind == SpeechRouting.Engine.QVOICE && request.file == null) {
+                request.startTimeoutMs?.let { ms ->
+                    main.postDelayed({ if (pending[key]?.started == false) failed(key, FallbackReason.QVOICE_NO_SOUND_IN_TIME, stopEngine = true) }, ms)
+                }
             }
         }
     }
@@ -334,7 +465,7 @@ class RinisoSpeech(
         }
     }
 
-    /** Voice (by name, gender, speed need) or the engine's default for the language; rate; pitch. */
+    /** Voice (chosen, by gender, by speed need) or the engine's default for the language; rate; pitch. */
     private fun configure(tts: TextToSpeech, request: Request, kind: SpeechRouting.Engine) {
         // setLanguage on every request: it also brings back the engine's
         // default voice after a setVoice, and picks up a default the user
@@ -346,11 +477,15 @@ class RinisoSpeech(
             language = request.locale.language,
             country = request.locale.country,
             gender = request.gender,
-            preferredName = request.voiceName,
+            // A chosen voice counts only on its own engine (after a fallback,
+            // the system engine uses its default for the language).
+            preferredName = request.voice?.takeIf { it.engine == kind }?.name,
             engineDefaultName = try { tts.voice?.name } catch (e: Exception) { null },
             fastStart = request.fastStart && kind == SpeechRouting.Engine.QVOICE,
         )
-        if (name != null) tts.voices?.firstOrNull { it.name == name }?.let { tts.setVoice(it) }
+        if (name != null) {
+            try { tts.voices?.firstOrNull { it.name == name } } catch (e: Exception) { null }?.let { tts.setVoice(it) }
+        }
         tts.setSpeechRate(request.rate)
         tts.setPitch(request.pitch)
     }
@@ -376,9 +511,10 @@ class RinisoSpeech(
     )
 
     /** A request [key] failed where it was: once on the system engine if QVoice had it, else reported. */
-    private fun failed(key: String, stopEngine: Boolean = false) {
+    private fun failed(key: String, reason: FallbackReason, stopEngine: Boolean = false) {
         val p = pending.remove(key) ?: return
         if (p.engine == SpeechRouting.Engine.QVOICE) {
+            p.request.callback?.onFallback(p.request.id, reason)
             // Spoken requests QVoice holds after this one would otherwise be
             // heard before its fallback: take them back, stop QVoice, and
             // send them again in their order, the failed one (on the phone's
@@ -405,6 +541,13 @@ class RinisoSpeech(
             }
         }
 
+        override fun onRangeStart(utteranceId: String, start: Int, end: Int, frame: Int) {
+            main.post {
+                val p = pending[utteranceId] ?: return@post
+                p.request.callback?.onRange(p.request.id, start, end, p.engine)
+            }
+        }
+
         override fun onDone(utteranceId: String) {
             main.post {
                 val p = pending.remove(utteranceId) ?: return@post
@@ -414,12 +557,12 @@ class RinisoSpeech(
         }
 
         override fun onError(utteranceId: String, errorCode: Int) {
-            main.post { failed(utteranceId) }
+            main.post { failed(utteranceId, FallbackReason.QVOICE_REFUSED) }
         }
 
         @Deprecated("Android calls onError(String, Int) on API 21+")
         override fun onError(utteranceId: String) {
-            main.post { failed(utteranceId) }
+            main.post { failed(utteranceId, FallbackReason.QVOICE_REFUSED) }
         }
     }
 }

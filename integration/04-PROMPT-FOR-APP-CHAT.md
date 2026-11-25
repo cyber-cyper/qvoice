@@ -32,7 +32,9 @@ change. Otherwise continue.
 2. Copy RinisoSpeech unchanged into com.riniso.speech, with its test.
 3. Add the `<queries>` entry.
 4. Route every TextToSpeech use through RinisoSpeech, as the brief says.
-5. Add the "Voice engine" setting and the dismissible "Get QVoice" card.
+5. Add the one voice choice (Automatic / Your phone's voice / A voice you
+   choose, as in 02-INTEGRATION-GUIDE.md) and the dismissible "Get QVoice"
+   card, with the app's name as the link's `source`.
 6. Update CHANGELOG.md and docs/TESTING.md, and record the reasoning in
    code comments.
 7. Raise the versionCode by exactly 1.

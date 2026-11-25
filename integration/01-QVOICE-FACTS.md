@@ -62,6 +62,11 @@ engine (a decision taken in October 2026).
   (built-in, Kokoro), 22,050 Hz (Piper), 44,100 Hz (Supertonic). Read the
   rate from the WAV header and never assume one.
 - **Rate and pitch:** speech rates up to 6× are supported, with pitch.
+- **Progress within a request:** QVoice reports `onStart` and `onDone`, but
+  no `onRangeStart` yet. Google's engine reports words. Apps that follow
+  the voice should speak sentence by sentence, which gives exact progress
+  with every engine. QVoice reporting its chunks as ranges is planned
+  (roadmap Q1).
 - **Audio attributes, focus and ducking:** handled by Android's TTS framework
   for every engine, as the app sets them with `setAudioAttributes`.
 - **Standard intents:**
@@ -78,7 +83,11 @@ engine (a decision taken in October 2026).
 
 - No Indian-language voices other than Hindi (Kokoro and Supertonic, which
   are slow on mid-range phones).
-- No API beyond Android's TextToSpeech. No deep link "download a voice for
-  language X" yet: the voice library opens on its full list. If an app needs
-  that, ask for it in the QVoice chat. It would use the standard
-  `ACTION_INSTALL_TTS_DATA` plus an extra.
+- No API beyond Android's TextToSpeech. **"Open the library for language X"**
+  has a fixed contract: `ACTION_INSTALL_TTS_DATA` plus the extra
+  `com.riniso.qvoice.extra.LANGUAGE` (BCP-47). The helper already sends it;
+  QVoice will honour it from roadmap Q1. Until then the full library opens.
+- **Before the first unlock after a restart, QVoice can't run** (it isn't
+  direct-boot aware, like most apps). Alarms then speak with the phone's
+  voice, or play audio the app rendered earlier into device-protected
+  storage.
